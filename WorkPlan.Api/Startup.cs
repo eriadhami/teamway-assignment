@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using WorkPlan.Api.Brokers.Storages;
 
 namespace WorkPlan.Api
 {
@@ -13,6 +14,7 @@ namespace WorkPlan.Api
         {
             services.AddLogging();
             services.AddControllers();
+            services.AddDbContext<StorageBroker>();
 
             services.AddSwaggerGen(options =>
             {
@@ -47,6 +49,11 @@ namespace WorkPlan.Api
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        private static void AddBrokers(IServiceCollection services)
+        {
+            services.AddTransient<IStorageBroker, StorageBroker>();
         }
     }
 }
