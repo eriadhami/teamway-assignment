@@ -3,61 +3,60 @@ using WorkPlan.Api.Brokers.DateTimes;
 using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
 
-namespace WorkPlan.Api
+namespace WorkPlan.Api;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration) =>
+        Configuration = configuration;
+
+    public IConfiguration Configuration { get; }
+
+    public void ConfigureServices(IServiceCollection services)
     {
-        public Startup(IConfiguration configuration) =>
-            Configuration = configuration;
+        services.AddLogging();
+        services.AddControllers();
+        services.AddDbContext<StorageBroker>();
 
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
+        services.AddSwaggerGen(options =>
         {
-            services.AddLogging();
-            services.AddControllers();
-            services.AddDbContext<StorageBroker>();
-
-            services.AddSwaggerGen(options =>
+            var openApiInfo = new OpenApiInfo
             {
-                var openApiInfo = new OpenApiInfo
-                {
-                    Title = "WorkPaln.Api",
-                    Version = "v1"
-                };
+                Title = "WorkPlan.Api",
+                Version = "v1"
+            };
 
-                options.SwaggerDoc(
-                    name: "v1",
-                    info: openApiInfo);
+            options.SwaggerDoc(
+                name: "v1",
+                info: openApiInfo);
+        });
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint(
+                    url: "/swagger/v1/swagger.json",
+                    name: "WorkPlan.Api v1");
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
+        app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
+    }
 
-                app.UseSwaggerUI(options =>
-                {
-                    options.SwaggerEndpoint(
-                        url: "/swagger/v1/swagger.json",
-                        name: "WorkPaln.Api v1");
-                });
-            }
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
-        }
-
-        private static void AddBrokers(IServiceCollection services)
-        {
-            services.AddTransient<IStorageBroker, StorageBroker>();
-            services.AddTransient<ILoggingBroker, LoggingBroker>();
-            services.AddTransient<IDateTimeBroker, DateTimeBroker>();
-        }
+    private static void AddBrokers(IServiceCollection services)
+    {
+        services.AddScoped<IStorageBroker, StorageBroker>();
+        services.AddTransient<ILoggingBroker, LoggingBroker>();
+        services.AddTransient<IDateTimeBroker, DateTimeBroker>();
     }
 }
