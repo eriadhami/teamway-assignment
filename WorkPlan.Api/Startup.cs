@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models;
-using WorkPlan.Api.Brokers.Storages;
+using WorkPlan.Api.Brokers.DateTimes;
 using WorkPlan.Api.Brokers.Loggings;
+using WorkPlan.Api.Brokers.Storages;
 
 namespace WorkPlan.Api
 {
@@ -56,6 +57,7 @@ namespace WorkPlan.Api
         {
             services.AddTransient<IStorageBroker, StorageBroker>();
             services.AddTransient<ILoggingBroker, LoggingBroker>();
+            services.AddTransient<IDateTimeBroker, DateTimeBroker>();
         }
     }
 }
