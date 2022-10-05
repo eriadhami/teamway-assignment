@@ -1,6 +1,5 @@
 using EFxceptions;
- using Microsoft.EntityFrameworkCore;
- using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace WorkPlan.Api.Brokers.Storages;
 
