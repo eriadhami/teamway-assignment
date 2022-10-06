@@ -18,6 +18,10 @@ public partial class WorkerService
         {
             throw CreateAndLogValidationException(nullWorkerException);
         }
+        catch (InvalidWorkerException invalidWorkerException)
+        {
+            throw CreateAndLogValidationException(invalidWorkerException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
