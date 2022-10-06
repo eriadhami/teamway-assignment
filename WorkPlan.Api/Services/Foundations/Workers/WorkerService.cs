@@ -22,6 +22,6 @@ public class WorkerService : IWorkerService
     }
     public ValueTask<Worker> AddWorkerAsync(Worker worker)
     {
-        throw new NotImplementedException();
+        return storageBroker.InsertWorkerAsync(worker);
     }
 }

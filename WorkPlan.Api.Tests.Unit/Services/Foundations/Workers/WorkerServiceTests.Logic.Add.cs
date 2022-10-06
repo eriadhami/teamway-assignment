@@ -33,10 +33,6 @@ public partial class WorkerServiceTests
         // then
         actualWorker.Should().BeEquivalentTo(expectedWorker);
 
-        this.dateTimeBrokerMock.Verify(broker =>
-            broker.GetCurrentDateTimeOffset(),
-                Times.Once);
-
         this.storageBrokerMock.Verify(broker =>
             broker.InsertWorkerAsync(inputWorker),
                 Times.Once);
