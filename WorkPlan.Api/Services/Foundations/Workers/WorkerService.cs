@@ -5,7 +5,7 @@ using WorkPlan.Api.Brokers.Storages;
 
 namespace WorkPlan.Api.Services.Foundations.Workers;
 
-public class WorkerService : IWorkerService
+public partial class WorkerService : IWorkerService
 {
     private readonly IStorageBroker storageBroker;
     private readonly IDateTimeBroker dateTimeBroker;
@@ -20,8 +20,11 @@ public class WorkerService : IWorkerService
         this.dateTimeBroker = dateTimeBroker;
         this.loggingBroker = loggingBroker;
     }
-    public ValueTask<Worker> AddWorkerAsync(Worker worker)
-    {
-        return storageBroker.InsertWorkerAsync(worker);
-    }
+    public ValueTask<Worker> AddWorkerAsync(Worker worker) =>
+        TryCatch(async () =>
+        {
+            ValidateWorkerOnAdd(worker);
+
+            return await this.storageBroker.InsertWorkerAsync(worker);
+        });
 }
