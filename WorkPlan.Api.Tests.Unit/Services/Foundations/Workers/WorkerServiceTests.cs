@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Moq;
 using Tynamix.ObjectFiller;
 using WorkPlan.Api.Brokers.DateTimes;
@@ -5,6 +6,7 @@ using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
 using WorkPlan.Api.Models.Workers;
 using WorkPlan.Api.Services.Foundations.Workers;
+using Xeptions;
 
 namespace WorkPlan.Api.Tests.Unit.Services.Foundations.Workers;
 
@@ -29,7 +31,7 @@ public partial class WorkerServiceTests
 
     private static DateTimeOffset GetRandomDateTimeOffset() =>
             new DateTimeRange(earliestDate: new DateTime()).GetValue();
-            
+
     private static Worker CreateRandomWorker(DateTimeOffset dates) =>
             CreateWorkerFiller(dates).Create();
 
@@ -42,4 +44,7 @@ public partial class WorkerServiceTests
 
             return filler;
         }
+    
+    private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+            actualException => actualException.SameExceptionAs(expectedException);
 }
