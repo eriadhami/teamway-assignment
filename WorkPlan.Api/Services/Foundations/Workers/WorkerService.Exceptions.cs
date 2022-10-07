@@ -76,6 +76,13 @@ public partial class WorkerService
 
             throw CreateAndLogCriticalDependencyException(failedWorkerStorageException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceWorkerException =
+                new FailedWorkerServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceWorkerException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
