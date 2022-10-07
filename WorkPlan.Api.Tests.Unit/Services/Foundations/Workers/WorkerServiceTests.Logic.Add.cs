@@ -12,15 +12,10 @@ public partial class WorkerServiceTests
     public async Task ShouldAddWorkerAsync()
     {
         // given
-        DateTimeOffset dateTime = GetRandomDateTimeOffset();
-        Worker randomWorker = CreateRandomWorker(dateTime);
+        Worker randomWorker = CreateRandomWorker();
         Worker inputWorker = randomWorker;
         Worker storageWorker = inputWorker;
         Worker expectedWorker = storageWorker.DeepClone();
-
-        this.dateTimeBrokerMock.Setup(broker =>
-            broker.GetCurrentDateTimeOffset())
-                .Returns(dateTime);
 
         this.storageBrokerMock.Setup(broker =>
             broker.InsertWorkerAsync(inputWorker))
@@ -37,7 +32,6 @@ public partial class WorkerServiceTests
             broker.InsertWorkerAsync(inputWorker),
                 Times.Once);
 
-        this.dateTimeBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }

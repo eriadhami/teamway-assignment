@@ -30,25 +30,11 @@ public partial class WorkerServiceTests
             dateTimeBroker: this.dateTimeBrokerMock.Object,
             loggingBroker: this.loggingBrokerMock.Object);
     }
-
-    private static DateTimeOffset GetRandomDateTimeOffset() =>
-            new DateTimeRange(earliestDate: new DateTime()).GetValue();
-
-    private static Worker CreateRandomWorker(DateTimeOffset dates) =>
-            CreateWorkerFiller(dates).Create();
     
     private static Worker CreateRandomWorker() =>
-            CreateWorkerFiller(GetRandomDateTimeOffset()).Create();
+            CreateWorkerFiller().Create();
 
-    private static Filler<Worker> CreateWorkerFiller(DateTimeOffset dates)
-        {
-            var filler = new Filler<Worker>();
-
-            filler.Setup()
-                .OnType<DateTimeOffset>().Use(dates);
-
-            return filler;
-        }
+    private static Filler<Worker> CreateWorkerFiller() => new Filler<Worker>();
     
     private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
             actualException => actualException.SameExceptionAs(expectedException);

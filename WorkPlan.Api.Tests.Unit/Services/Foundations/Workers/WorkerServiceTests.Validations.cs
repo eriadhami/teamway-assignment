@@ -36,7 +36,6 @@ public partial class WorkerServiceTests
             broker.InsertWorkerAsync(invalidWorker),
                 Times.Never);
 
-        this.dateTimeBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
