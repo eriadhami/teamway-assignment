@@ -46,6 +46,13 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(invalidWorkerReferenceException);
         }
+        catch (DbUpdateException databaseUpdateException)
+        {
+            var failedStorageWorkerException =
+                new FailedWorkerStorageException(databaseUpdateException);
+
+            throw CreateAndLogDependencyException(failedStorageWorkerException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
