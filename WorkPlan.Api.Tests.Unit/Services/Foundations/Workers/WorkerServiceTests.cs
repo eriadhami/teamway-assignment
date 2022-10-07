@@ -32,13 +32,19 @@ public partial class WorkerServiceTests
     }
     
     private static Worker CreateRandomWorker() =>
-            CreateWorkerFiller().Create();
+        CreateWorkerFiller().Create();
 
     private static Filler<Worker> CreateWorkerFiller() => new Filler<Worker>();
     
     private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
-            actualException => actualException.SameExceptionAs(expectedException);
+        actualException => actualException.SameExceptionAs(expectedException);
 
     private static SqlException GetSqlException() =>
-            (SqlException)FormatterServices.GetUninitializedObject(typeof(SqlException));
+        (SqlException)FormatterServices.GetUninitializedObject(typeof(SqlException));
+
+    private static string GetRandomMessage() =>
+        new MnemonicString(wordCount: GetRandomNumber()).GetValue();
+
+    private static int GetRandomNumber() =>
+        new IntRange(min: 2, max: 10).GetValue();
 }

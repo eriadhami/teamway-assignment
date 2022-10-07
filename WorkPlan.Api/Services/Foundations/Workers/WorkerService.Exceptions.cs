@@ -1,3 +1,4 @@
+using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using WorkPlan.Api.Models.Workers;
 using WorkPlan.Api.Models.Workers.Exceptions;
