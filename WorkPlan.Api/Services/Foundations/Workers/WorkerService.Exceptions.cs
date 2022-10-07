@@ -10,6 +10,7 @@ namespace WorkPlan.Api.Services.Foundations.Workers;
 public partial class WorkerService
 {
     private delegate ValueTask<Worker> ReturningWorkerFunction();
+    private delegate IQueryable<Worker> ReturningWorkersFunction();
 
     private async ValueTask<Worker> TryCatch(ReturningWorkerFunction returningWorkerFunction)
     {
@@ -59,6 +60,21 @@ public partial class WorkerService
                 new FailedWorkerServiceException(serviceException);
 
             throw CreateAndLogServiceException(failedServiceWorkerException);
+        }
+    }
+
+    private IQueryable<Worker> TryCatch(ReturningWorkersFunction returningWorkersFunction)
+    {
+        try
+        {
+            return returningWorkersFunction();
+        }
+        catch (SqlException sqlException)
+        {
+            var failedWorkerStorageException =
+                new FailedWorkerStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedWorkerStorageException);
         }
     }
 

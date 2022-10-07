@@ -28,8 +28,6 @@ public partial class WorkerService : IWorkerService
             return await this.storageBroker.InsertWorkerAsync(worker);
         });
     
-    public IQueryable<Worker> RetrieveAllWorkers()
-    {
-        return this.storageBroker.SelectAllWorkers();
-    }
+    public IQueryable<Worker> RetrieveAllWorkers() =>
+            TryCatch(() => this.storageBroker.SelectAllWorkers());
 }
