@@ -95,4 +95,47 @@ public partial class WorkerServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async void ShouldThrowValidationExceptionOnCreateIfReferenceErrorOccursAndLogItAsync()
+    {
+        // given
+        Worker someWorker = CreateRandomWorker();
+        string randomMessage = GetRandomMessage();
+        string exceptionMessage = randomMessage;
+
+        var foreignKeyConstraintConflictException =
+            new ForeignKeyConstraintConflictException(exceptionMessage);
+
+        var invalidWorkerReferenceException =
+            new InvalidWorkerReferenceException(foreignKeyConstraintConflictException);
+
+        var expectedWorkerDependencyValidationException =
+            new WorkerDependencyException(invalidWorkerReferenceException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertWorkerAsync(
+                    It.IsAny<Worker>()))
+                        .ThrowsAsync(foreignKeyConstraintConflictException);
+
+        // when
+        ValueTask<Worker> addWorkerTask =
+            this.workerService.AddWorkerAsync(someWorker);
+
+        // then
+        await Assert.ThrowsAsync<WorkerDependencyException>(() =>
+            addWorkerTask.AsTask());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedWorkerDependencyValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertWorkerAsync(It.IsAny<Worker>()),
+                    Times.Once);
+
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+        this.storageBrokerMock.VerifyNoOtherCalls();
+    }
 }
