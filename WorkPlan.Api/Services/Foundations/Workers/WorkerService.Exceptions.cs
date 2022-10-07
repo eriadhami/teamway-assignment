@@ -31,6 +31,13 @@ public partial class WorkerService
 
             throw CreateAndLogCriticalDependencyException(failedWorkerStorageException);
         }
+        catch (DuplicateKeyException duplicateKeyException)
+        {
+            var alreadyExistWorkerException =
+                new AlreadyExistsWorkerException(duplicateKeyException);
+
+            throw CreateAndLogDependencyException(alreadyExistWorkerException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
@@ -45,6 +52,14 @@ public partial class WorkerService
     {
         var workerDependencyException = new WorkerDependencyException(exception);
         this.loggingBroker.LogCritical(workerDependencyException);
+
+        return workerDependencyException;
+    }
+
+    private WorkerDependencyException CreateAndLogDependencyException(Xeption exception)
+    {
+        var workerDependencyException = new WorkerDependencyException(exception);
+        this.loggingBroker.LogError(workerDependencyException);
 
         return workerDependencyException;
     }
