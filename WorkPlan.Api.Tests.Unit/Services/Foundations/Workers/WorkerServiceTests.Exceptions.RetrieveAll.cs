@@ -46,4 +46,42 @@ public partial class WorkerServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public void ShouldThrowServiceExceptionOnRetrieveAllWhenServiceErrorOccursAndLogIt()
+    {
+        //given
+        string exceptionMessage = GetRandomMessage();
+        var serviceException = new Exception(exceptionMessage);
+
+        var failedWorkerServiceException =
+            new FailedWorkerServiceException(serviceException);
+
+        var expectedWorkerServiceException =
+            new WorkerServiceException(failedWorkerServiceException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectAllWorkers())
+                .Throws(serviceException);
+
+        //when
+        Action retrieveAllWorkersAction = () =>
+                this.workerService.RetrieveAllWorkers();
+
+        //then
+        Assert.Throws<WorkerServiceException>(
+            retrieveAllWorkersAction);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllWorkers(),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedWorkerServiceException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
