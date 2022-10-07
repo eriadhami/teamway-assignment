@@ -1,6 +1,7 @@
 using EFxceptions.Models.Exceptions;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using WorkPlan.Api.Models.Workers;
 using WorkPlan.Api.Models.Workers.Exceptions;
@@ -137,5 +138,46 @@ public partial class WorkerServiceTests
 
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task ShouldThrowDependencyExceptionOnCreateIfDatabaseUpdateErrorOccursAndLogItAsync()
+    {
+        // given
+        Worker someWorker = CreateRandomWorker();
+
+        var databaseUpdateException =
+            new DbUpdateException();
+
+        var failedWorkerStorageException =
+            new FailedWorkerStorageException(databaseUpdateException);
+
+        var expectedWorkerDependencyException =
+            new WorkerDependencyException(failedWorkerStorageException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertWorkerAsync(
+                    It.IsAny<Worker>()))
+                        .ThrowsAsync(databaseUpdateException);
+
+        // when
+        ValueTask<Worker> addWorkerTask =
+            this.workerService.AddWorkerAsync(someWorker);
+
+        // then
+        await Assert.ThrowsAsync<WorkerDependencyException>(() =>
+            addWorkerTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertWorkerAsync(It.IsAny<Worker>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedWorkerDependencyException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
     }
 }
