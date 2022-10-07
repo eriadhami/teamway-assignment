@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Moq;
 using WorkPlan.Api.Models.Workers;
@@ -12,8 +13,7 @@ public partial class WorkerServiceTests
     public async Task ShouldThrowCriticalDependencyExceptionOnCreateIfSqlErrorOccursAndLogItAsync()
     {
         // given
-        DateTimeOffset randomDateTime = GetRandomDateTimeOffset();
-        Worker someWorker = CreateRandomWorker(randomDateTime);
+        Worker someWorker = CreateRandomWorker();
         SqlException sqlException = GetSqlException();
 
         var failedWorkerStorageException =
@@ -22,20 +22,25 @@ public partial class WorkerServiceTests
         var expectedWorkerDependencyException =
             new WorkerDependencyException(failedWorkerStorageException);
 
-        this.dateTimeBrokerMock.Setup(broker =>
-            broker.GetCurrentDateTimeOffset())
-                .Throws(sqlException);
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertWorkerAsync(
+                    It.IsAny<Worker>()))
+                        .ThrowsAsync(sqlException);
 
         // when
         ValueTask<Worker> addWorkerTask =
             this.workerService.AddWorkerAsync(someWorker);
 
-        // then
-        await Assert.ThrowsAsync<WorkerDependencyException>(() =>
-            addWorkerTask.AsTask());
+        WorkerDependencyException actualWorkerDependencyException =
+            await Assert.ThrowsAsync<WorkerDependencyException>(
+                addWorkerTask.AsTask);
 
-        this.dateTimeBrokerMock.Verify(broker =>
-            broker.GetCurrentDateTimeOffset(),
+        // then
+        actualWorkerDependencyException.Should().BeEquivalentTo(
+            expectedWorkerDependencyException);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertWorkerAsync(It.IsAny<Worker>()),
                 Times.Once);
 
         this.loggingBrokerMock.Verify(broker =>
@@ -43,12 +48,7 @@ public partial class WorkerServiceTests
                 expectedWorkerDependencyException))),
                     Times.Once);
 
-        this.storageBrokerMock.Verify(broker =>
-            broker.InsertWorkerAsync(It.IsAny<Worker>()),
-                Times.Never);
-
-        this.dateTimeBrokerMock.VerifyNoOtherCalls();
-        this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
     }
 }

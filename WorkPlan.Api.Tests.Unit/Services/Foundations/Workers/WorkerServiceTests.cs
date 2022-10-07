@@ -36,6 +36,9 @@ public partial class WorkerServiceTests
 
     private static Worker CreateRandomWorker(DateTimeOffset dates) =>
             CreateWorkerFiller(dates).Create();
+    
+    private static Worker CreateRandomWorker() =>
+            CreateWorkerFiller(GetRandomDateTimeOffset()).Create();
 
     private static Filler<Worker> CreateWorkerFiller(DateTimeOffset dates)
         {

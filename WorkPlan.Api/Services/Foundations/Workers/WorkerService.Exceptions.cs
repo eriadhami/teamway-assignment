@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using WorkPlan.Api.Models.Workers;
 using WorkPlan.Api.Models.Workers.Exceptions;
 using Xeptions;
@@ -22,6 +23,13 @@ public partial class WorkerService
         {
             throw CreateAndLogValidationException(invalidWorkerException);
         }
+        catch (SqlException sqlException)
+        {
+            var failedWorkerStorageException =
+                new FailedWorkerStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedWorkerStorageException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
@@ -30,5 +38,13 @@ public partial class WorkerService
         this.loggingBroker.LogError(workerValidationException);
 
         return workerValidationException;
+    }
+
+    private WorkerDependencyException CreateAndLogCriticalDependencyException(Xeption exception)
+    {
+        var workerDependencyException = new WorkerDependencyException(exception);
+        this.loggingBroker.LogCritical(workerDependencyException);
+
+        return workerDependencyException;
     }
 }
