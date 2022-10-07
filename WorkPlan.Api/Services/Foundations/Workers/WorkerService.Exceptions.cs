@@ -53,6 +53,13 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(failedStorageWorkerException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceWorkerException =
+                new FailedWorkerServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceWorkerException);
+        }
     }
 
     private WorkerValidationException CreateAndLogValidationException(Xeption exception)
@@ -77,5 +84,13 @@ public partial class WorkerService
         this.loggingBroker.LogError(workerDependencyException);
 
         return workerDependencyException;
+    }
+
+    private WorkerServiceException CreateAndLogServiceException(Xeption exception)
+    {
+        var workerServiceException = new WorkerServiceException(exception);
+        this.loggingBroker.LogError(workerServiceException);
+
+        return workerServiceException;
     }
 }
