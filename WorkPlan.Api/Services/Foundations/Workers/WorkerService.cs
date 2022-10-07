@@ -27,4 +27,9 @@ public partial class WorkerService : IWorkerService
 
             return await this.storageBroker.InsertWorkerAsync(worker);
         });
+    
+    public IQueryable<Worker> RetrieveAllWorkers()
+    {
+        throw new NotImplementedException();
+    }
 }

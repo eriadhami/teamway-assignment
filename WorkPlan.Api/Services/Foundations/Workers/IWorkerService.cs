@@ -5,4 +5,5 @@ namespace WorkPlan.Api.Services.Foundations.Workers;
 public interface IWorkerService
 {
     ValueTask<Worker> AddWorkerAsync(Worker worker);
+    IQueryable<Worker> RetrieveAllWorkers();
 }

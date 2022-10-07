@@ -34,6 +34,13 @@ public partial class WorkerServiceTests
     private static Worker CreateRandomWorker() =>
         CreateWorkerFiller().Create();
 
+    private static IQueryable<Worker> CreateRandomWorkers()
+    {
+        return CreateWorkerFiller()
+                .Create(count: GetRandomNumber())
+                .AsQueryable();
+    }
+
     private static Filler<Worker> CreateWorkerFiller() => new Filler<Worker>();
     
     private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
