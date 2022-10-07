@@ -30,6 +30,6 @@ public partial class WorkerService : IWorkerService
     
     public IQueryable<Worker> RetrieveAllWorkers()
     {
-        throw new NotImplementedException();
+        return this.storageBroker.SelectAllWorkers();
     }
 }
