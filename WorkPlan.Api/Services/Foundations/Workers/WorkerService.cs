@@ -65,6 +65,8 @@ public partial class WorkerService : IWorkerService
             Worker someWorker =
                 await this.storageBroker.SelectWorkerByIdAsync(workerId);
 
+            ValidateStorageWorker(someWorker, workerId);
+
             return await this.storageBroker.DeleteWorkerAsync(someWorker);
         });
 }
