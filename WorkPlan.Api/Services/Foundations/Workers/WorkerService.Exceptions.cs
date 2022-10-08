@@ -51,6 +51,13 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(invalidWorkerReferenceException);
         }
+        catch (DbUpdateConcurrencyException databaseUpdateConcurrencyException)
+        {
+            var lockedWorkerException =
+                new LockedWorkerException(databaseUpdateConcurrencyException);
+
+            throw CreateAndLogDependencyException(lockedWorkerException);
+        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStorageWorkerException =
