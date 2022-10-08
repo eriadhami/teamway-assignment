@@ -6,4 +6,5 @@ public interface IWorkerService
 {
     ValueTask<Worker> AddWorkerAsync(Worker worker);
     IQueryable<Worker> RetrieveAllWorkers();
+    ValueTask<Worker> RetrieveWorkerByIdAsync(Guid workerId);
 }
