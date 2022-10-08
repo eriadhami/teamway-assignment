@@ -5,7 +5,7 @@ namespace WorkPlan.Api.Services.Foundations.Workers;
 
 public partial class WorkerService
 {
-    private void ValidateWorkerOnAdd(Worker worker)
+    private void ValidateWorker(Worker worker)
     {
         ValidateWorkerIsNotNull(worker);
 

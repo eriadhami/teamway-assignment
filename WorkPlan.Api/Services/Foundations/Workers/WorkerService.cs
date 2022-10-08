@@ -23,7 +23,7 @@ public partial class WorkerService : IWorkerService
     public ValueTask<Worker> AddWorkerAsync(Worker worker) =>
         TryCatch(async () =>
         {
-            ValidateWorkerOnAdd(worker);
+            ValidateWorker(worker);
 
             return await this.storageBroker.InsertWorkerAsync(worker);
         });
@@ -44,11 +44,14 @@ public partial class WorkerService : IWorkerService
             return maybeWorker;
         });
     
-    public async ValueTask<Worker> ModifyWorkerAsync (Worker worker)
-    {
-        Worker maybeWorker = await this.storageBroker
-            .SelectWorkerByIdAsync(worker.ID);
+    public ValueTask<Worker> ModifyWorkerAsync(Worker worker) =>
+        TryCatch(async () =>
+        {
+            ValidateWorker(worker);
 
-        return await this.storageBroker.UpdateWorkerAsync(maybeWorker);
-    }
+            var maybeWorker =
+                await this.storageBroker.SelectWorkerByIdAsync(worker.ID);
+
+            return await this.storageBroker.UpdateWorkerAsync(worker);
+        });
 }
