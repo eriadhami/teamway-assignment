@@ -43,4 +43,9 @@ public partial class WorkerService : IWorkerService
 
             return maybeWorker;
         });
+    
+    public ValueTask<Worker> ModifyWorkerAsync (Worker worker)
+    {
+        throw new NotImplementedException();
+    }
 }
