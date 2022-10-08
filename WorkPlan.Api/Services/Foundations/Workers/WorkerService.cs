@@ -57,9 +57,14 @@ public partial class WorkerService : IWorkerService
             return await this.storageBroker.UpdateWorkerAsync(worker);
         });
 
-    public async ValueTask<Worker> RemoveWorkerByIdAsync(Guid workerId)
-    {
-        var maybeWorker = await this.storageBroker.SelectWorkerByIdAsync(workerId);
-        return await this.storageBroker.DeleteWorkerAsync(maybeWorker);
-    }
+    public ValueTask<Worker> RemoveWorkerByIdAsync(Guid workerId) =>
+        TryCatch(async () =>
+        {
+            ValidateWorkerId(workerId);
+
+            Worker someWorker =
+                await this.storageBroker.SelectWorkerByIdAsync(workerId);
+
+            return await this.storageBroker.DeleteWorkerAsync(someWorker);
+        });
 }
