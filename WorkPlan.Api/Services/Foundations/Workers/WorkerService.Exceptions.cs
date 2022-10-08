@@ -30,13 +30,6 @@ public partial class WorkerService
         {
             throw CreateAndLogValidationException(notFoundWorkerException);
         }
-        catch (SqlException sqlException)
-        {
-            var failedWorkerStorageException =
-                new FailedWorkerStorageException(sqlException);
-
-            throw CreateAndLogCriticalDependencyException(failedWorkerStorageException);
-        }
         catch (DuplicateKeyException duplicateKeyException)
         {
             var alreadyExistWorkerException =
