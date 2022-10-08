@@ -22,10 +22,6 @@ public partial class WorkerService
         {
             throw CreateAndLogValidationException(nullWorkerException);
         }
-        catch (InvalidWorkerException invalidWorkerException)
-        {
-            throw CreateAndLogValidationException(invalidWorkerException);
-        }
         catch (NotFoundWorkerException notFoundWorkerException)
         {
             throw CreateAndLogValidationException(notFoundWorkerException);
