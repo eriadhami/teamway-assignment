@@ -26,6 +26,10 @@ public partial class WorkerService
         {
             throw CreateAndLogValidationException(invalidWorkerException);
         }
+        catch (NotFoundWorkerException notFoundWorkerException)
+        {
+            throw CreateAndLogValidationException(notFoundWorkerException);
+        }
         catch (SqlException sqlException)
         {
             var failedWorkerStorageException =
