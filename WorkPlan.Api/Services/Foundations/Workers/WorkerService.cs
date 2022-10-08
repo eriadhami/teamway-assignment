@@ -44,8 +44,11 @@ public partial class WorkerService : IWorkerService
             return maybeWorker;
         });
     
-    public ValueTask<Worker> ModifyWorkerAsync (Worker worker)
+    public async ValueTask<Worker> ModifyWorkerAsync (Worker worker)
     {
-        throw new NotImplementedException();
+        Worker maybeWorker = await this.storageBroker
+            .SelectWorkerByIdAsync(worker.ID);
+
+        return await this.storageBroker.UpdateWorkerAsync(maybeWorker);
     }
 }
