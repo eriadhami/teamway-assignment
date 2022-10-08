@@ -18,6 +18,10 @@ public partial class WorkerService
         {
             return await returningWorkerFunction();
         }
+        catch (NullWorkerException nullWorkerException)
+        {
+            throw CreateAndLogValidationException(nullWorkerException);
+        }
         catch (InvalidWorkerException invalidWorkerException)
         {
             throw CreateAndLogValidationException(invalidWorkerException);
