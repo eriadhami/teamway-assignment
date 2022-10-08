@@ -56,4 +56,9 @@ public partial class WorkerService : IWorkerService
 
             return await this.storageBroker.UpdateWorkerAsync(worker);
         });
+
+    public ValueTask<Worker> RemoveWorkerByIdAsync(Guid workerId)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -8,4 +8,5 @@ public interface IWorkerService
     IQueryable<Worker> RetrieveAllWorkers();
     ValueTask<Worker> RetrieveWorkerByIdAsync(Guid workerId);
     ValueTask<Worker> ModifyWorkerAsync(Worker worker);
+    ValueTask<Worker> RemoveWorkerByIdAsync(Guid workerId);
 }
