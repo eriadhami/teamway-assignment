@@ -41,6 +41,14 @@ public partial class WorkerService
         invalidWorkerException.ThrowIfContainsErrors();
     }
 
+    private void ValidateStorageWorker(Worker maybeWorker, Guid workerId)
+    {
+        if (maybeWorker is null)
+        {
+            throw new NotFoundWorkerException(workerId);
+        }
+    }
+
     private void ValidateWorkerId(Guid workerId) =>
         Validate((Rule: IsInvalid(workerId), Parameter: nameof(Worker.ID)));
 

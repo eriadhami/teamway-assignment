@@ -32,13 +32,15 @@ public partial class WorkerService : IWorkerService
             TryCatch(() => this.storageBroker.SelectAllWorkers());
 
     public ValueTask<Worker> RetrieveWorkerByIdAsync(Guid workerId) =>
-            TryCatch(async () =>
-            {
-                ValidateWorkerId(workerId);
+        TryCatch(async () =>
+        {
+            ValidateWorkerId(workerId);
 
-                Worker maybeWorker = await this.storageBroker
-                    .SelectWorkerByIdAsync(workerId);
+            Worker maybeWorker = await this.storageBroker
+                .SelectWorkerByIdAsync(workerId);
+            
+            ValidateStorageWorker(maybeWorker, workerId);
 
-                return maybeWorker;
-            });
+            return maybeWorker;
+        });
 }
