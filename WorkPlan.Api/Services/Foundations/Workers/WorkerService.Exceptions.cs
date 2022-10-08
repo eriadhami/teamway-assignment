@@ -51,13 +51,6 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(invalidWorkerReferenceException);
         }
-        catch (DbUpdateException databaseUpdateException)
-        {
-            var failedStorageWorkerException =
-                new FailedWorkerStorageException(databaseUpdateException);
-
-            throw CreateAndLogDependencyException(failedStorageWorkerException);
-        }
         catch (Exception serviceException)
         {
             var failedServiceWorkerException =
