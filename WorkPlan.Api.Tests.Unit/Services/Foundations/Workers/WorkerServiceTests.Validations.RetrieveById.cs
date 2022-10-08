@@ -43,4 +43,42 @@ public partial class WorkerServiceTests
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowNotFoundExceptionOnRetrieveByIdIfWorkerIsNotFoundAndLogItAsync()
+    {
+        //given
+        Guid someWorkerId = Guid.NewGuid();
+        Worker noWorker = null;
+
+        var notFoundWorkerException =
+            new NotFoundWorkerException(someWorkerId);
+
+        var expectedWorkerValidationException =
+            new WorkerValidationException(notFoundWorkerException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectWorkerByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(noWorker);
+
+        //when
+        ValueTask<Worker> retrieveWorkerByIdTask =
+            this.workerService.RetrieveWorkerByIdAsync(someWorkerId);
+
+        //then
+        await Assert.ThrowsAsync<WorkerValidationException>(() =>
+            retrieveWorkerByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectWorkerByIdAsync(It.IsAny<Guid>()),
+                Times.Once());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedWorkerValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
