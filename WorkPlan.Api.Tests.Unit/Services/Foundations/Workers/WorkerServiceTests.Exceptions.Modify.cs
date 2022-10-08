@@ -132,4 +132,43 @@ public partial class WorkerServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowServiceExceptionOnModifyIfServiceErrorOccursAndLogItAsync()
+    {
+        // given
+        Worker someWorker = CreateRandomWorker();
+        var serviceException = new Exception();
+
+        var failedWorkerServiceException =
+            new FailedWorkerServiceException(serviceException);
+
+        var expectedWorkerServiceException =
+            new WorkerServiceException(failedWorkerServiceException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.SelectWorkerByIdAsync(
+                    It.IsAny<Guid>()))
+                        .ThrowsAsync(serviceException);
+
+        // when
+        ValueTask<Worker> modifyWorkerTask =
+            this.workerService.ModifyWorkerAsync(someWorker);
+
+        // then
+        await Assert.ThrowsAsync<WorkerServiceException>(() =>
+            modifyWorkerTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectWorkerByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedWorkerServiceException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
