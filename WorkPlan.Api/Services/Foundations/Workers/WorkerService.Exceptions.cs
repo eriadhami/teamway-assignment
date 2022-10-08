@@ -65,6 +65,13 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(failedStorageWorkerException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceWorkerException =
+                new FailedWorkerServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceWorkerException);
+        }
     }
 
     private IQueryable<Worker> TryCatch(ReturningWorkersFunction returningWorkersFunction)
