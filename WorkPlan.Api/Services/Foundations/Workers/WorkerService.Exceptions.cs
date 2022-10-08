@@ -44,6 +44,13 @@ public partial class WorkerService
 
             throw CreateAndLogDependencyException(alreadyExistWorkerException);
         }
+        catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
+        {
+            var invalidWorkerReferenceException =
+                new InvalidWorkerReferenceException(foreignKeyConstraintConflictException);
+
+            throw CreateAndLogDependencyException(invalidWorkerReferenceException);
+        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStorageWorkerException =
