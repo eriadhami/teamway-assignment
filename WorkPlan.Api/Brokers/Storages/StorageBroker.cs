@@ -20,4 +20,10 @@ public partial class StorageBroker : EFxceptionsContext, IStorageBroker
 
         optionsBuilder.UseSqlServer(connectionString);
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder modelConfigurationBuilder)
+    {
+        AddShiftsConfigurations(modelConfigurationBuilder);
+        base.ConfigureConventions(modelConfigurationBuilder);
+    }
 }
