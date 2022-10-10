@@ -26,6 +26,10 @@ public partial class ShiftService
         {
             throw CreateAndLogValidationException(invalidShiftException);
         }
+        catch (NotFoundShiftException notFoundShiftException)
+        {
+            throw CreateAndLogValidationException(notFoundShiftException);
+        }
         catch (SqlException sqlException)
         {
             var failedShiftStorageException =
