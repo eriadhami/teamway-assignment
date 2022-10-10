@@ -1,3 +1,4 @@
+using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Models.Shifts.Exceptions;
@@ -30,6 +31,13 @@ public partial class ShiftService
 
             throw CreateAndLogCriticalDependencyException(failedShiftStorageException);
         }
+        catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
+        {
+            var invalidShiftReferenceException =
+                new InvalidShiftReferenceException(foreignKeyConstraintConflictException);
+
+            throw CreateAndLogDependencyException(invalidShiftReferenceException);
+        }
     }
 
     private ShiftValidationException CreateAndLogValidationException(Xeption exception)
@@ -44,6 +52,14 @@ public partial class ShiftService
     {
         var shiftDependencyException = new ShiftDependencyException(exception);
         this.loggingBroker.LogCritical(shiftDependencyException);
+
+        return shiftDependencyException;
+    }
+
+    private ShiftDependencyException CreateAndLogDependencyException(Xeption exception)
+    {
+        var shiftDependencyException = new ShiftDependencyException(exception);
+        this.loggingBroker.LogError(shiftDependencyException);
 
         return shiftDependencyException;
     }
