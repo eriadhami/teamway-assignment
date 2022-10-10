@@ -8,4 +8,5 @@ public interface IShiftService
     IQueryable<Shift> RetrieveAllShifts();
     ValueTask<Shift> RetrieveShiftByIdAsync(Guid shiftId);
     ValueTask<Shift> ModifyShiftAsync(Shift shift);
+    ValueTask<Shift> RemoveShiftByIdAsync(Guid shiftId);
 }

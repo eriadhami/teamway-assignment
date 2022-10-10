@@ -52,4 +52,9 @@ public partial class ShiftService : IShiftService
 
             return await this.storageBroker.UpdateShiftAsync(shift);
         });
+    
+    public ValueTask<Shift> RemoveShiftByIdAsync(Guid shiftId)
+    {
+        throw new NotImplementedException();
+    }
 }
