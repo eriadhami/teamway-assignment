@@ -69,6 +69,13 @@ public partial class ShiftService
 
             throw CreateAndLogCriticalDependencyException(failedShiftStorageException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceShiftException =
+                new FailedShiftServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceShiftException);
+        }
     }
 
     private ShiftValidationException CreateAndLogValidationException(Xeption exception)
