@@ -61,6 +61,8 @@ public partial class ShiftService : IShiftService
             Shift someShift =
                 await this.storageBroker.SelectShiftByIdAsync(shiftId);
 
+            ValidateStorageShift(someShift, shiftId);
+
             return await this.storageBroker.DeleteShiftAsync(someShift);
         });
 }
