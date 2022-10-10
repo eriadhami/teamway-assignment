@@ -48,4 +48,7 @@ public partial class ShiftServiceTests
 
     private static int GetRandomNumber() =>
             new IntRange(min: 1, max: 23).GetValue();
+    
+    private static string GetRandomMessage() =>
+        new MnemonicString(wordCount: GetRandomNumber()).GetValue();
 }
