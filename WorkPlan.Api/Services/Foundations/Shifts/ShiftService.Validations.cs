@@ -12,6 +12,9 @@ public partial class ShiftService
 
     private static void ValidateShiftIsNotNull(Shift shift)
     {
-        throw new NotImplementedException();
+        if (shift is null)
+        {
+            throw new NullShiftException();
+        }
     }
 }
