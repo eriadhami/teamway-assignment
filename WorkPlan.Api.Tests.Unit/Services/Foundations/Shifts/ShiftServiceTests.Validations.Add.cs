@@ -51,7 +51,7 @@ public partial class ShiftServiceTests
         // given
         var invalidShift = new Shift
         {
-            Name = invalidText
+            Name = invalidText,
         };
 
         var invalidShiftException =
@@ -66,16 +66,8 @@ public partial class ShiftServiceTests
             values: "Text is required");
 
         invalidShiftException.AddData(
-            key: nameof(Shift.StartHour),
-            values: "Time is required");
-
-        invalidShiftException.AddData(
             key: nameof(Shift.EndHour),
-            values:
-            new[] {
-                "Time is required",
-                $"Time is the same as {nameof(Shift.StartHour)}"
-            });
+            values: $"Time is the same as or before the {nameof(Shift.StartHour)}");
 
         var expectedShiftValidationException =
             new ShiftValidationException(invalidShiftException);

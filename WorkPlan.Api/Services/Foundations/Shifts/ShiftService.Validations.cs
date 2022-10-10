@@ -12,10 +12,8 @@ public partial class ShiftService
         Validate(
                 (Rule: IsInvalid(shift.ID), Parameter: nameof(Shift.ID)),
                 (Rule: IsInvalid(shift.Name), Parameter: nameof(Shift.Name)),
-                (Rule: IsInvalid(shift.StartHour), Parameter: nameof(Shift.StartHour)),
-                (Rule: IsInvalid(shift.EndHour), Parameter: nameof(Shift.EndHour)),
                 
-                (Rule: IsSame(
+                (Rule: IsSameOrBefore(
                     firstTime: shift.EndHour,
                     secondTime: shift.StartHour,
                     secondTimeName: nameof(Shift.StartHour)),
@@ -60,15 +58,9 @@ public partial class ShiftService
         Message = "Text is required"
     };
 
-    private static dynamic IsInvalid(TimeOnly time) => new
+    private static dynamic IsSameOrBefore(TimeOnly firstTime, TimeOnly secondTime, string secondTimeName) => new
     {
-        Condition = time == default,
-        Message = "Time is required"
-    };
-
-    private static dynamic IsSame(TimeOnly firstTime, TimeOnly secondTime, string secondTimeName) => new
-    {
-        Condition = firstTime == secondTime,
-        Message = $"Time is the same as {secondTimeName}"
+        Condition = firstTime <= secondTime,
+        Message = $"Time is the same as or before the {secondTimeName}"
     };
 }

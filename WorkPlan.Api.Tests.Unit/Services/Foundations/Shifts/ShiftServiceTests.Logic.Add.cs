@@ -13,6 +13,8 @@ public partial class ShiftServiceTests
     {
         // given
         Shift randomShift = CreateRandomShift();
+        int randomNumber = GetRandomNumber();
+        randomShift.EndHour = randomShift.StartHour.AddHours(randomNumber);
         Shift inputShift = randomShift;
         Shift storageShift = inputShift;
         Shift expectedShift = storageShift.DeepClone();

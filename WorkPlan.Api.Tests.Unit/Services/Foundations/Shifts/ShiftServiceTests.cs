@@ -45,4 +45,7 @@ public partial class ShiftServiceTests
 
     private static SqlException GetSqlException() =>
         (SqlException)FormatterServices.GetUninitializedObject(typeof(SqlException));
+
+    private static int GetRandomNumber() =>
+            new IntRange(min: 1, max: 23).GetValue();
 }
