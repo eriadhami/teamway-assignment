@@ -30,6 +30,13 @@ public partial class ShiftServiceTests
     private static Shift CreateRandomShift() =>
         CreateShiftFiller().Create();
 
+    private static IQueryable<Shift> CreateRandomShifts()
+    {
+        return CreateShiftFiller()
+                .Create(GetRandomNumber())
+                .AsQueryable();
+    }
+
     private static Filler<Shift> CreateShiftFiller()
     {
         var filler = new Filler<Shift>();

@@ -23,4 +23,9 @@ public partial class ShiftService : IShiftService
 
             return await this.storageBroker.InsertShiftAsync(shift);
         });
+    
+    public IQueryable<Shift> RetrieveAllShifts()
+    {
+        throw new NotImplementedException();
+    }
 }
