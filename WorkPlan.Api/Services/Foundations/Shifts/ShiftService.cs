@@ -16,8 +16,8 @@ public partial class ShiftService : IShiftService
         this.storageBroker = storageBroker;
         this.loggingBroker = loggingBroker;
     }
-    public ValueTask<Shift> AddShiftAsync(Shift shift)
+    public async ValueTask<Shift> AddShiftAsync(Shift shift)
     {
-        throw new NotImplementedException();
+        return await this.storageBroker.InsertShiftAsync(shift);
     }
 }
