@@ -1,9 +1,11 @@
+using System.Linq.Expressions;
 using Moq;
 using Tynamix.ObjectFiller;
 using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Services.Foundations.Shifts;
+using Xeptions;
 
 namespace WorkPlan.Api.Tests.Unit.Services.Foundations.Shifts;
 
@@ -35,4 +37,7 @@ public partial class ShiftServiceTests
 
         return filler;
     }
+
+    private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+        actualException => actualException.SameExceptionAs(expectedException);
 }

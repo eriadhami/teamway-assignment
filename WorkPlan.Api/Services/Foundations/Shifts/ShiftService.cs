@@ -16,8 +16,11 @@ public partial class ShiftService : IShiftService
         this.storageBroker = storageBroker;
         this.loggingBroker = loggingBroker;
     }
-    public async ValueTask<Shift> AddShiftAsync(Shift shift)
-    {
-        return await this.storageBroker.InsertShiftAsync(shift);
-    }
+    public ValueTask<Shift> AddShiftAsync(Shift shift) =>
+        TryCatch(async () =>
+        {
+            ValidateShift(shift);
+
+            return await this.storageBroker.InsertShiftAsync(shift);
+        });
 }
