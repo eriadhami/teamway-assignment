@@ -8,7 +8,6 @@ namespace WorkPlan.Api.Tests.Unit.Services.Foundations.Shifts;
 
 public partial class ShiftServiceTests
 {
-
     [Fact]
     public async void ShouldRemoveShiftByIdAsync()
     {
