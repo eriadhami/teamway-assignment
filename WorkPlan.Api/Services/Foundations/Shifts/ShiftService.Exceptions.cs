@@ -44,6 +44,13 @@ public partial class ShiftService
 
             throw CreateAndLogDependencyException(invalidShiftReferenceException);
         }
+        catch (DbUpdateConcurrencyException databaseUpdateConcurrencyException)
+        {
+            var lockedShiftException =
+                new LockedShiftException(databaseUpdateConcurrencyException);
+
+            throw CreateAndLogDependencyException(lockedShiftException);
+        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStorageShiftException =
