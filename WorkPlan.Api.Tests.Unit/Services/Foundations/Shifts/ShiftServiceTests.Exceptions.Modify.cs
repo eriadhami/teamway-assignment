@@ -17,7 +17,7 @@ public partial class ShiftServiceTests
         int randomNumber = GetRandomNumber();
         Shift randomShift = CreateRandomShift();
         randomShift.EndHour = randomShift.StartHour.AddHours(randomNumber);
-        
+
         SqlException sqlException = GetSqlException();
 
         var failedShiftStorageException =
@@ -50,5 +50,50 @@ public partial class ShiftServiceTests
 
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async void ShouldThrowValidationExceptionOnModifyIfReferenceErrorOccursAndLogItAsync()
+    {
+        // given
+        int randomNumber = GetRandomNumber(); 
+        Shift someShift = CreateRandomShift();
+        someShift.EndHour = someShift.StartHour.AddHours(randomNumber);
+        string randomMessage = GetRandomMessage();
+        string exceptionMessage = randomMessage;
+
+        var foreignKeyConstraintConflictException =
+            new ForeignKeyConstraintConflictException(exceptionMessage);
+
+        var invalidShiftReferenceException =
+            new InvalidShiftReferenceException(foreignKeyConstraintConflictException);
+
+        var expectedShiftDependencyValidationException =
+            new ShiftDependencyException(invalidShiftReferenceException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.SelectShiftByIdAsync(
+                    It.IsAny<Guid>()))
+                        .ThrowsAsync(foreignKeyConstraintConflictException);
+
+        // when
+        ValueTask<Shift> modifyShiftTask =
+            this.shiftService.ModifyShiftAsync(someShift);
+
+        // then
+        await Assert.ThrowsAsync<ShiftDependencyException>(() =>
+            modifyShiftTask.AsTask());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftDependencyValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectShiftByIdAsync(It.IsAny<Guid>()),
+                    Times.Once);
+
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+        this.storageBrokerMock.VerifyNoOtherCalls();
     }
 }
