@@ -30,6 +30,8 @@ public partial class ShiftService : IShiftService
     public ValueTask<Shift> RetrieveShiftByIdAsync(Guid shiftId) =>
         TryCatch(async () =>
         {
+            ValidateShiftId(shiftId);
+
             Shift maybeShift = await this.storageBroker
                 .SelectShiftByIdAsync(shiftId);
 
