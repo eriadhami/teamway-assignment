@@ -46,6 +46,13 @@ public partial class ShiftService
 
             throw CreateAndLogDependencyException(failedStorageShiftException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceShiftException =
+                new FailedShiftServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceShiftException);
+        }
     }
 
     private ShiftValidationException CreateAndLogValidationException(Xeption exception)
@@ -70,5 +77,13 @@ public partial class ShiftService
         this.loggingBroker.LogError(shiftDependencyException);
 
         return shiftDependencyException;
+    }
+
+    private ShiftServiceException CreateAndLogServiceException(Xeption exception)
+    {
+        var shiftServiceException = new ShiftServiceException(exception);
+        this.loggingBroker.LogError(shiftServiceException);
+
+        return shiftServiceException;
     }
 }
