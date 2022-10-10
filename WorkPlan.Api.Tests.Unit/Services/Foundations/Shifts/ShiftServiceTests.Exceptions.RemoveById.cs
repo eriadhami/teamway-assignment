@@ -50,4 +50,48 @@ public partial class ShiftServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowDependencyValidationOnRemoveIfDatabaseUpdateConcurrencyErrorOccursAndLogItAsync()
+    {
+        // given
+        Guid someShiftId = Guid.NewGuid();
+
+        var databaseUpdateConcurrencyException =
+            new DbUpdateConcurrencyException();
+
+        var lockedShiftException =
+            new LockedShiftException(databaseUpdateConcurrencyException);
+
+        var expectedShiftDependencyValidationException =
+            new ShiftDependencyException(lockedShiftException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectShiftByIdAsync(It.IsAny<Guid>()))
+                .ThrowsAsync(databaseUpdateConcurrencyException);
+
+        // when
+        ValueTask<Shift> removeShiftByIdTask =
+            this.shiftService.RemoveShiftByIdAsync(someShiftId);
+
+        // then
+        await Assert.ThrowsAsync<ShiftDependencyException>(() =>
+            removeShiftByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectShiftByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftDependencyValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.DeleteShiftAsync(It.IsAny<Shift>()),
+                Times.Never);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
