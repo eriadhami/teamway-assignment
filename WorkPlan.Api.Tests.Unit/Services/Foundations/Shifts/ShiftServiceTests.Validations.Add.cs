@@ -39,4 +39,60 @@ public partial class ShiftServiceTests
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task ShouldThrowValidationExceptionOnCreateIfShiftIsInvalidAndLogItAsync(
+        string invalidText)
+    {
+        // given
+        var invalidShift = new Shift
+        {
+            Name = invalidText
+        };
+
+        var invalidShiftException =
+            new InvalidShiftException();
+
+        invalidShiftException.AddData(
+            key: nameof(Shift.ID),
+            values: "Id is required");
+
+        invalidShiftException.AddData(
+            key: nameof(Shift.Name),
+            values: "Text is required");
+
+        invalidShiftException.AddData(
+            key: nameof(Shift.StartHour),
+            values: "Time is required");
+
+        invalidShiftException.AddData(
+            key: nameof(Shift.EndHour),
+            values: "Time is required");
+
+        var expectedShiftValidationException =
+            new ShiftValidationException(invalidShiftException);
+
+        // when
+        ValueTask<Shift> addShiftTask =
+            this.shiftService.AddShiftAsync(invalidShift);
+
+        // then
+        await Assert.ThrowsAsync<ShiftValidationException>(() =>
+            addShiftTask.AsTask());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertShiftAsync(invalidShift),
+                Times.Never);
+
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+        this.storageBrokerMock.VerifyNoOtherCalls();
+    }
 }
