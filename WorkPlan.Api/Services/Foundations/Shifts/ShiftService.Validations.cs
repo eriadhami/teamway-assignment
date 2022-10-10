@@ -46,8 +46,16 @@ public partial class ShiftService
         invalidShiftException.ThrowIfContainsErrors();
     }
 
-    private void ValidateShiftId(Guid workerId) =>
-        Validate((Rule: IsInvalid(workerId), Parameter: nameof(Shift.ID)));
+    private void ValidateShiftId(Guid shiftId) =>
+        Validate((Rule: IsInvalid(shiftId), Parameter: nameof(Shift.ID)));
+
+    private void ValidateStorageShift(Shift maybeShift, Guid shiftId)
+    {
+        if (maybeShift is null)
+        {
+            throw new NotFoundShiftException(shiftId);
+        }
+    }
 
     private static dynamic IsInvalid(Guid id) => new
     {
