@@ -1,5 +1,6 @@
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Models.Shifts.Exceptions;
@@ -97,5 +98,48 @@ public partial class ShiftServiceTests
 
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task ShouldThrowDependencyExceptionOnCreateIfDatabaseUpdateErrorOccursAndLogItAsync()
+    {
+        // given
+        int randomNumber = GetRandomNumber();
+        Shift someShift = CreateRandomShift();
+        someShift.EndHour = someShift.StartHour.AddHours(randomNumber);
+
+        var databaseUpdateException =
+            new DbUpdateException();
+
+        var failedShiftStorageException =
+            new FailedShiftStorageException(databaseUpdateException);
+
+        var expectedShiftDependencyException =
+            new ShiftDependencyException(failedShiftStorageException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertShiftAsync(
+                    It.IsAny<Shift>()))
+                        .ThrowsAsync(databaseUpdateException);
+
+        // when
+        ValueTask<Shift> addShiftTask =
+            this.shiftService.AddShiftAsync(someShift);
+
+        // then
+        await Assert.ThrowsAsync<ShiftDependencyException>(() =>
+            addShiftTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertShiftAsync(It.IsAny<Shift>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftDependencyException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
     }
 }
