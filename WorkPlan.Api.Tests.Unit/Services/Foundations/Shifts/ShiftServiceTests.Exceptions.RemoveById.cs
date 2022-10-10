@@ -94,4 +94,46 @@ public partial class ShiftServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowServiceExceptionOnRemoveIfExceptionOccursAndLogItAsync()
+    {
+        // given
+        Guid someShiftId = Guid.NewGuid();
+        var serviceException = new Exception();
+
+        var failedShiftServiceException =
+            new FailedShiftServiceException(serviceException);
+
+        var expectedShiftServiceException =
+            new ShiftServiceException(failedShiftServiceException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectShiftByIdAsync(It.IsAny<Guid>()))
+                .ThrowsAsync(serviceException);
+
+        // when
+        ValueTask<Shift> removeShiftByIdTask =
+            this.shiftService.RemoveShiftByIdAsync(someShiftId);
+
+        // then
+        await Assert.ThrowsAsync<ShiftServiceException>(() =>
+            removeShiftByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectShiftByIdAsync(It.IsAny<Guid>()),
+                    Times.Once());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftServiceException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.DeleteShiftAsync(It.IsAny<Shift>()),
+                    Times.Never());
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
