@@ -1,5 +1,6 @@
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Models.Shifts.Exceptions;
 using Xeptions;
@@ -37,6 +38,13 @@ public partial class ShiftService
                 new InvalidShiftReferenceException(foreignKeyConstraintConflictException);
 
             throw CreateAndLogDependencyException(invalidShiftReferenceException);
+        }
+        catch (DbUpdateException databaseUpdateException)
+        {
+            var failedStorageShiftException =
+                new FailedShiftStorageException(databaseUpdateException);
+
+            throw CreateAndLogDependencyException(failedStorageShiftException);
         }
     }
 
