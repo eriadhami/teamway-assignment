@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Moq;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Models.Shifts.Exceptions;
@@ -70,7 +71,11 @@ public partial class ShiftServiceTests
 
         invalidShiftException.AddData(
             key: nameof(Shift.EndHour),
-            values: "Time is required");
+            values:
+            new[] {
+                "Time is required",
+                $"Time is the same as {nameof(Shift.StartHour)}"
+            });
 
         var expectedShiftValidationException =
             new ShiftValidationException(invalidShiftException);
