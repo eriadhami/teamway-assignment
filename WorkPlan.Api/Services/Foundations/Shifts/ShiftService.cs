@@ -47,6 +47,8 @@ public partial class ShiftService : IShiftService
 
             var maybeShift =
                 await this.storageBroker.SelectShiftByIdAsync(shift.ID);
+            
+            ValidateStorageShift(maybeShift, shift.ID);
 
             return await this.storageBroker.UpdateShiftAsync(shift);
         });

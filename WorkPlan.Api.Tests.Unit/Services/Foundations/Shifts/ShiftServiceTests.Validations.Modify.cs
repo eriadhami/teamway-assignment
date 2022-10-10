@@ -95,4 +95,45 @@ public partial class ShiftServiceTests
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowValidationExceptionOnModifyIfShiftDoesNotExistAndLogItAsync()
+    {
+        // given
+        int randomNumber = GetRandomNumber();
+        Shift randomShift = CreateRandomShift();
+        Shift nonExistShift = randomShift;
+        nonExistShift.EndHour = nonExistShift.StartHour.AddHours(randomNumber);
+        Shift nullShift = null;
+
+        var notFoundShiftException =
+            new NotFoundShiftException(nonExistShift.ID);
+
+        var expectedShiftValidationException =
+            new ShiftValidationException(notFoundShiftException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectShiftByIdAsync(nonExistShift.ID))
+                .ReturnsAsync(nullShift);
+
+        // when 
+        ValueTask<Shift> modifyShiftTask =
+            this.shiftService.ModifyShiftAsync(nonExistShift);
+
+        // then
+        await Assert.ThrowsAsync<ShiftValidationException>(() =>
+            modifyShiftTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectShiftByIdAsync(nonExistShift.ID),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedShiftValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
