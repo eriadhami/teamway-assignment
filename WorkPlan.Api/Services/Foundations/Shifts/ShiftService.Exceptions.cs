@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using WorkPlan.Api.Models.Shifts;
 using WorkPlan.Api.Models.Shifts.Exceptions;
 using Xeptions;
@@ -22,6 +23,13 @@ public partial class ShiftService
         {
             throw CreateAndLogValidationException(invalidShiftException);
         }
+        catch (SqlException sqlException)
+        {
+            var failedShiftStorageException =
+                new FailedShiftStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedShiftStorageException);
+        }
     }
 
     private ShiftValidationException CreateAndLogValidationException(Xeption exception)
@@ -30,5 +38,13 @@ public partial class ShiftService
         this.loggingBroker.LogError(shiftValidationException);
 
         return shiftValidationException;
+    }
+
+    private ShiftDependencyException CreateAndLogCriticalDependencyException(Xeption exception)
+    {
+        var shiftDependencyException = new ShiftDependencyException(exception);
+        this.loggingBroker.LogCritical(shiftDependencyException);
+
+        return shiftDependencyException;
     }
 }

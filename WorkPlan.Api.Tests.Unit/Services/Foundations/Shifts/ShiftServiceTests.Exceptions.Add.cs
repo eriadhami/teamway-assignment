@@ -15,6 +15,8 @@ public partial class ShiftServiceTests
     {
         // given
         Shift someShift = CreateRandomShift();
+        int randomNumber = GetRandomNumber();
+        someShift.EndHour = someShift.StartHour.AddHours(randomNumber);
         SqlException sqlException = GetSqlException();
 
         var failedShiftStorageException =
