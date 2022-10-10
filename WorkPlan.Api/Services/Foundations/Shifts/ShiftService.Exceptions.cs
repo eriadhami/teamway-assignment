@@ -37,6 +37,13 @@ public partial class ShiftService
 
             throw CreateAndLogCriticalDependencyException(failedShiftStorageException);
         }
+        catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
+        {
+            var invalidShiftReferenceException =
+                new InvalidShiftReferenceException(foreignKeyConstraintConflictException);
+
+            throw CreateAndLogDependencyException(invalidShiftReferenceException);
+        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStorageShiftException =
