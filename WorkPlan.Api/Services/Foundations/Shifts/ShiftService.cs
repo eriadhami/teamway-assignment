@@ -40,8 +40,9 @@ public partial class ShiftService : IShiftService
             return maybeShift;
         });
     
-    public ValueTask<Shift> ModifyShiftAsync (Shift shift)
+    public async ValueTask<Shift> ModifyShiftAsync (Shift shift)
     {
-        throw new NotImplementedException();
+        var maybeShift = await this.storageBroker.SelectShiftByIdAsync(shift.ID);
+        return await this.storageBroker.UpdateShiftAsync(maybeShift);
     }
 }
