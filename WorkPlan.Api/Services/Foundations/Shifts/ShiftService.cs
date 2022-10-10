@@ -39,4 +39,9 @@ public partial class ShiftService : IShiftService
 
             return maybeShift;
         });
+    
+    public ValueTask<Shift> ModifyShiftAsync (Shift shift)
+    {
+        throw new NotImplementedException();
+    }
 }
