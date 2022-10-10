@@ -27,8 +27,12 @@ public partial class ShiftService : IShiftService
     public IQueryable<Shift> RetrieveAllShifts() =>
         TryCatch(() => this.storageBroker.SelectAllShifts());
 
-    public async ValueTask<Shift> RetrieveShiftByIdAsync(Guid shiftId)
-    {
-        return await this.storageBroker.SelectShiftByIdAsync(shiftId);
-    }
+    public ValueTask<Shift> RetrieveShiftByIdAsync(Guid shiftId) =>
+        TryCatch(async () =>
+        {
+            Shift maybeShift = await this.storageBroker
+                .SelectShiftByIdAsync(shiftId);
+
+            return maybeShift;
+        });
 }

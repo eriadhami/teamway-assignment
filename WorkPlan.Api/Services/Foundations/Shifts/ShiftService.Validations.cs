@@ -46,6 +46,9 @@ public partial class ShiftService
         invalidShiftException.ThrowIfContainsErrors();
     }
 
+    private void ValidateShiftId(Guid workerId) =>
+        Validate((Rule: IsInvalid(workerId), Parameter: nameof(Shift.ID)));
+
     private static dynamic IsInvalid(Guid id) => new
     {
         Condition = id == Guid.Empty,
