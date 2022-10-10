@@ -51,7 +51,10 @@ public partial class ShiftService
 
     private void ValidateStorageShift(Shift maybeShift, Guid shiftId)
     {
-        throw new NotImplementedException();
+        if (maybeShift is null)
+        {
+            throw new NotFoundShiftException(shiftId);
+        }
     }
 
     private static dynamic IsInvalid(Guid id) => new
