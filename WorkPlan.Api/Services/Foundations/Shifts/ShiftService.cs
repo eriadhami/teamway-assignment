@@ -26,4 +26,9 @@ public partial class ShiftService : IShiftService
     
     public IQueryable<Shift> RetrieveAllShifts() =>
         TryCatch(() => this.storageBroker.SelectAllShifts());
+
+    public ValueTask<Shift> RetrieveShiftByIdAsync(Guid shiftId)
+    {
+        throw new NotImplementedException();
+    }
 }
