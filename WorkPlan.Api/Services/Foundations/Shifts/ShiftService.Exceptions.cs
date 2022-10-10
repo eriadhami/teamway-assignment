@@ -44,13 +44,6 @@ public partial class ShiftService
 
             throw CreateAndLogDependencyException(invalidShiftReferenceException);
         }
-        catch (DbUpdateException databaseUpdateException)
-        {
-            var failedStorageShiftException =
-                new FailedShiftStorageException(databaseUpdateException);
-
-            throw CreateAndLogDependencyException(failedStorageShiftException);
-        }
         catch (Exception serviceException)
         {
             var failedServiceShiftException =
