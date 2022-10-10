@@ -53,9 +53,14 @@ public partial class ShiftService : IShiftService
             return await this.storageBroker.UpdateShiftAsync(shift);
         });
     
-    public async ValueTask<Shift> RemoveShiftByIdAsync(Guid shiftId)
-    {
-        var maybeShift = await this.storageBroker.SelectShiftByIdAsync(shiftId);
-        return await this.storageBroker.DeleteShiftAsync(maybeShift);
-    }
+    public ValueTask<Shift> RemoveShiftByIdAsync(Guid shiftId) =>
+        TryCatch(async () =>
+        {
+            ValidateShiftId(shiftId);
+
+            Shift someShift =
+                await this.storageBroker.SelectShiftByIdAsync(shiftId);
+
+            return await this.storageBroker.DeleteShiftAsync(someShift);
+        });
 }
