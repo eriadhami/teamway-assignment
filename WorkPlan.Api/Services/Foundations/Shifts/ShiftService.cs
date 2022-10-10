@@ -24,8 +24,6 @@ public partial class ShiftService : IShiftService
             return await this.storageBroker.InsertShiftAsync(shift);
         });
     
-    public IQueryable<Shift> RetrieveAllShifts()
-    {
-        return this.storageBroker.SelectAllShifts();
-    }
+    public IQueryable<Shift> RetrieveAllShifts() =>
+        TryCatch(() => this.storageBroker.SelectAllShifts());
 }

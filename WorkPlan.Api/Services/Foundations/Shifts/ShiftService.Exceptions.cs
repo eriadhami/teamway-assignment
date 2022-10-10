@@ -10,6 +10,7 @@ namespace WorkPlan.Api.Services.Foundations.Shifts;
 public partial class ShiftService
 {
     private delegate ValueTask<Shift> ReturningShiftFunction();
+    private delegate IQueryable<Shift> ReturningShiftsFunction();
 
     private async ValueTask<Shift> TryCatch(ReturningShiftFunction returningShiftFunction)
     {
@@ -52,6 +53,21 @@ public partial class ShiftService
                 new FailedShiftServiceException(serviceException);
 
             throw CreateAndLogServiceException(failedServiceShiftException);
+        }
+    }
+
+    private IQueryable<Shift> TryCatch(ReturningShiftsFunction returningShiftsFunction)
+    {
+        try
+        {
+            return returningShiftsFunction();
+        }
+        catch (SqlException sqlException)
+        {
+            var failedShiftStorageException =
+                new FailedShiftStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedShiftStorageException);
         }
     }
 
