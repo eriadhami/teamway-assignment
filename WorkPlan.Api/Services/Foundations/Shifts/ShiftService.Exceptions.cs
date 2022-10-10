@@ -51,6 +51,13 @@ public partial class ShiftService
 
             throw CreateAndLogDependencyException(failedStorageShiftException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServiceShiftException =
+                new FailedShiftServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServiceShiftException);
+        }
     }
 
     private IQueryable<Shift> TryCatch(ReturningShiftsFunction returningShiftsFunction)
