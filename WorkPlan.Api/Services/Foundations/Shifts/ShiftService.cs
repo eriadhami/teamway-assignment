@@ -26,6 +26,6 @@ public partial class ShiftService : IShiftService
     
     public IQueryable<Shift> RetrieveAllShifts()
     {
-        throw new NotImplementedException();
+        return this.storageBroker.SelectAllShifts();
     }
 }
