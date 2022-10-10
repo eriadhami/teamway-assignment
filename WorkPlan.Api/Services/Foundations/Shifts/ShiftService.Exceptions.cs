@@ -22,6 +22,10 @@ public partial class ShiftService
         {
             throw CreateAndLogValidationException(nullShiftException);
         }
+        catch (InvalidShiftException invalidShiftException)
+        {
+            throw CreateAndLogValidationException(invalidShiftException);
+        }
         catch (NotFoundShiftException notFoundShiftException)
         {
             throw CreateAndLogValidationException(notFoundShiftException);
