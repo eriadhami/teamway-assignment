@@ -17,8 +17,11 @@ public partial class PlanService : IPlanService
         this.loggingBroker = loggingBroker;
     }
 
-    public async ValueTask<Plan> AddPlanAsync(Plan plan)
-    {
-        return await this.storageBroker.InsertPlanAsync(plan);
-    }
+    public ValueTask<Plan> AddPlanAsync(Plan plan) =>
+        TryCatch(async () =>
+        {
+            ValidatePlan(plan);
+
+            return await this.storageBroker.InsertPlanAsync(plan);
+        });
 }
