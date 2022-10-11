@@ -18,6 +18,10 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(nullPlanException);
         }
+        catch (InvalidPlanException invalidPlanException)
+        {
+            throw CreateAndLogValidationException(invalidPlanException);
+        }
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
