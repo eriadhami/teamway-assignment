@@ -41,7 +41,15 @@ public partial class WorkerServiceTests
                 .AsQueryable();
     }
 
-    private static Filler<Worker> CreateWorkerFiller() => new Filler<Worker>();
+    private static Filler<Worker> CreateWorkerFiller()
+    {
+        var filler = new Filler<Worker>();
+
+        filler.Setup()
+            .OnProperty(worker => worker.Plans).IgnoreIt();
+
+        return filler;
+    }
     
     private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
         actualException => actualException.SameExceptionAs(expectedException);

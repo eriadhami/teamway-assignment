@@ -42,7 +42,8 @@ public partial class ShiftServiceTests
         var filler = new Filler<Shift>();
 
         filler.Setup()
-            .OnType<TimeOnly>().Use(TimeOnly.MinValue);
+            .OnType<TimeOnly>().Use(TimeOnly.MinValue)
+            .OnProperty(shift => shift.Plans).IgnoreIt();
 
         return filler;
     }
