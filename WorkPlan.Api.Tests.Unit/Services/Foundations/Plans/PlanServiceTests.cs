@@ -1,9 +1,11 @@
+using System.Linq.Expressions;
 using Moq;
 using Tynamix.ObjectFiller;
 using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
 using WorkPlan.Api.Models.Plans;
 using WorkPlan.Api.Services.Foundations.Plans;
+using Xeptions;
 
 namespace WorkPlan.Api.Tests.Unit.Services.Foundations.Plans;
 
@@ -37,4 +39,7 @@ public partial class PlanServiceTests
 
         return filler;
     }
+
+    private static Expression<Func<Xeption, bool>> SameExceptionAs(Xeption expectedException) =>
+        actualException => actualException.SameExceptionAs(expectedException);
 }
