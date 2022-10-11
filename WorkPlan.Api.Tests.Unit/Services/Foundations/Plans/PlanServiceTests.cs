@@ -33,7 +33,7 @@ public partial class PlanServiceTests
         var filler = new Filler<Plan>();
 
         filler.Setup()
-            .OnType<DateOnly>().Use(DateOnly.FromDateTime(DateTime.Now))
+            .OnType<DateOnly>().Use(DateOnly.MinValue)
             .OnProperty(plan => plan.Worker).IgnoreIt()
             .OnProperty(plan => plan.Shift).IgnoreIt();
 
