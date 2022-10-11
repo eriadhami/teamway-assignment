@@ -21,9 +21,16 @@ public partial class StorageBroker : EFxceptionsContext, IStorageBroker
         optionsBuilder.UseSqlServer(connectionString);
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            SetPlanReferences(modelBuilder);
+        }
+
     protected override void ConfigureConventions(ModelConfigurationBuilder modelConfigurationBuilder)
     {
         AddShiftsConfigurations(modelConfigurationBuilder);
+        AddPlansConfigurations(modelConfigurationBuilder);
         base.ConfigureConventions(modelConfigurationBuilder);
     }
 }
