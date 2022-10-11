@@ -17,8 +17,8 @@ public partial class PlanService : IPlanService
         this.loggingBroker = loggingBroker;
     }
 
-    public ValueTask<Plan> AddPlanAsync(Plan plan)
+    public async ValueTask<Plan> AddPlanAsync(Plan plan)
     {
-        throw new NotImplementedException();
+        return await this.storageBroker.InsertPlanAsync(plan);
     }
 }
