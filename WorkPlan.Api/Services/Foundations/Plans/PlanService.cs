@@ -54,8 +54,9 @@ public partial class PlanService : IPlanService
             return await this.storageBroker.UpdatePlanAsync(plan);
         });
 
-    public ValueTask<Plan> RemovePlanByIdAsync(Guid planId)
+    public async ValueTask<Plan> RemovePlanByIdAsync(Guid planId)
     {
-        throw new NotImplementedException();
+        var maybePlan = await this.storageBroker.SelectPlanByIdAsync(planId);
+        return await this.storageBroker.DeletePlanAsync(maybePlan);
     }
 }
