@@ -58,7 +58,17 @@ public partial class PlanService
 
     private IQueryable<Plan> TryCatch(ReturningPlansFunction returningPlansFunction)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return returningPlansFunction();
+        }
+        catch (SqlException sqlException)
+        {
+            var failedPlanStorageException =
+                new FailedPlanStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedPlanStorageException);
+        }
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
