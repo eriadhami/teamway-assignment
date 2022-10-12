@@ -48,6 +48,8 @@ public partial class PlanService : IPlanService
 
             var maybePlan =
                 await this.storageBroker.SelectPlanByIdAsync(plan.ID);
+            
+            ValidateStoragePlan(maybePlan, plan.ID);
 
             return await this.storageBroker.UpdatePlanAsync(plan);
         });
