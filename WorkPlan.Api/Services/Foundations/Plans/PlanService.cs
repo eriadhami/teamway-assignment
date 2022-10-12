@@ -24,4 +24,7 @@ public partial class PlanService : IPlanService
 
             return await this.storageBroker.InsertPlanAsync(plan);
         });
+    
+    public IQueryable<Plan> RetrieveAllPlans() =>
+        TryCatch(() => this.storageBroker.SelectAllPlans());
 }

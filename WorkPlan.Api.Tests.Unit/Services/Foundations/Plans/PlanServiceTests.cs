@@ -30,6 +30,13 @@ public partial class PlanServiceTests
     private static Plan CreateRandomPlan() =>
         CreatePlanFiller().Create();
 
+    private static IQueryable<Plan> CreateRandomPlans()
+    {
+        return CreatePlanFiller()
+                .Create(GetRandomNumber())
+                .AsQueryable();
+    }
+
     private static Filler<Plan> CreatePlanFiller()
     {
         var filler = new Filler<Plan>();

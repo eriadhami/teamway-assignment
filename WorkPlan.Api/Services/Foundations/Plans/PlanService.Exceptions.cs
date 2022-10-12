@@ -10,6 +10,7 @@ namespace WorkPlan.Api.Services.Foundations.Plans;
 public partial class PlanService
 {
     private delegate ValueTask<Plan> ReturningPlanFunction();
+    private delegate IQueryable<Plan> ReturningPlansFunction();
 
     private async ValueTask<Plan> TryCatch(ReturningPlanFunction returningPlanFunction)
     {
@@ -53,6 +54,11 @@ public partial class PlanService
 
             throw CreateAndLogServiceException(failedServicePlanException);
         }
+    }
+
+    private IQueryable<Plan> TryCatch(ReturningPlansFunction returningPlansFunction)
+    {
+        throw new NotImplementedException();
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
