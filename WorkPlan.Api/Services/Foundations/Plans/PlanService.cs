@@ -62,6 +62,8 @@ public partial class PlanService : IPlanService
             Plan somePlan =
                 await this.storageBroker.SelectPlanByIdAsync(planId);
 
+            ValidateStoragePlan(somePlan, planId);
+
             return await this.storageBroker.DeletePlanAsync(somePlan);
         });
 }
