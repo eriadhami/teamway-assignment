@@ -22,6 +22,10 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(nullPlanException);
         }
+        catch (InvalidPlanException invalidPlanException)
+        {
+            throw CreateAndLogValidationException(invalidPlanException);
+        }
         catch (NotFoundPlanException notFoundPlanException)
         {
             throw CreateAndLogValidationException(notFoundPlanException);
