@@ -46,6 +46,13 @@ public partial class PlanService
 
             throw CreateAndLogDependencyException(failedStoragePlanException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServicePlanException =
+                new FailedPlanServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServicePlanException);
+        }
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
@@ -70,5 +77,13 @@ public partial class PlanService
         this.loggingBroker.LogError(planDependencyException);
 
         return planDependencyException;
+    }
+
+    private PlanServiceException CreateAndLogServiceException(Xeption exception)
+    {
+        var planServiceException = new PlanServiceException(exception);
+        this.loggingBroker.LogError(planServiceException);
+
+        return planServiceException;
     }
 }
