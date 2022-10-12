@@ -44,6 +44,14 @@ public partial class PlanService
 
     private void ValidatePlanId(Guid planId) =>
         Validate((Rule: IsInvalid(planId), Parameter: nameof(Plan.ID)));
+    
+    private void ValidateStoragePlan(Plan maybePlan, Guid planId)
+    {
+        if (maybePlan is null)
+        {
+            throw new NotFoundPlanException(planId);
+        }
+    }
 
     private static dynamic IsInvalid(Guid id) => new
     {

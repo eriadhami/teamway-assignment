@@ -26,6 +26,10 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(invalidPlanException);
         }
+        catch (NotFoundPlanException notFoundPlanException)
+        {
+            throw CreateAndLogValidationException(notFoundPlanException);
+        }
         catch (SqlException sqlException)
         {
             var failedPlanStorageException =
