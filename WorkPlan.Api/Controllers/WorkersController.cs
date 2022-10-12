@@ -68,4 +68,32 @@ public class WorkersController : RESTFulController
             return InternalServerError(workerServiceException);
         }
     }
+
+    [HttpGet("{workerId}")]
+    public async ValueTask<ActionResult<Worker>> GetWorkerByIdAsync(Guid workerId)
+    {
+        try
+        {
+            Worker worker = await this.workerService.RetrieveWorkerByIdAsync(workerId);
+
+            return Ok(worker);
+        }
+        catch (WorkerValidationException workerValidationException)
+            when (workerValidationException.InnerException is NotFoundWorkerException)
+        {
+            return NotFound(workerValidationException.InnerException);
+        }
+        catch (WorkerValidationException workerValidationException)
+        {
+            return BadRequest(workerValidationException.InnerException);
+        }
+        catch (WorkerDependencyException workerDependencyException)
+        {
+            return InternalServerError(workerDependencyException);
+        }
+        catch (WorkerServiceException workerServiceException)
+        {
+            return InternalServerError(workerServiceException);
+        }
+    }
 }
