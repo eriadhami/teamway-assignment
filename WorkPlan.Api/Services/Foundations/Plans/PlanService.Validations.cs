@@ -14,6 +14,8 @@ public partial class PlanService
                 (Rule: IsInvalid(plan.WorkerID), Parameter: nameof(Plan.WorkerID)),
                 (Rule: IsInvalid(plan.ShiftID), Parameter: nameof(Plan.ShiftID)),
                 (Rule: IsInvalid(plan.Date), Parameter: nameof(Plan.Date)));
+        
+        ValidateDublicateWorkerOnSameDate(plan);
     }
 
     private static void ValidatePlanIsNotNull(Plan plan)
@@ -51,6 +53,21 @@ public partial class PlanService
         {
             throw new NotFoundPlanException(planId);
         }
+    }
+
+    private void ValidateDublicateWorkerOnSameDate(Plan plan)
+    {
+        var storagePlans = this.storageBroker.SelectAllPlans();
+        bool exist = storagePlans
+            .Where(storagePlan => 
+                storagePlan.WorkerID == plan.WorkerID && 
+                storagePlan.Date == plan.Date)
+            .Any();
+
+        if (exist)
+            {
+                throw new DublicatePlanWorkerDateException();
+            }
     }
 
     private static dynamic IsInvalid(Guid id) => new
