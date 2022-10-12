@@ -2,6 +2,9 @@ using Microsoft.OpenApi.Models;
 using WorkPlan.Api.Brokers.DateTimes;
 using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
+using WorkPlan.Api.Services.Foundations.Plans;
+using WorkPlan.Api.Services.Foundations.Shifts;
+using WorkPlan.Api.Services.Foundations.Workers;
 
 namespace WorkPlan.Api;
 
@@ -17,6 +20,8 @@ public class Startup
         services.AddLogging();
         services.AddControllers();
         services.AddDbContext<StorageBroker>();
+        AddBrokers(services);
+        AddServices(services);
 
         services.AddSwaggerGen(options =>
         {
@@ -58,5 +63,12 @@ public class Startup
         services.AddScoped<IStorageBroker, StorageBroker>();
         services.AddTransient<ILoggingBroker, LoggingBroker>();
         services.AddTransient<IDateTimeBroker, DateTimeBroker>();
+    }
+
+    private static void AddServices(IServiceCollection services)
+    {
+        services.AddTransient<IWorkerService, WorkerService>();
+        services.AddTransient<IShiftService, ShiftService>();
+        services.AddTransient<IPlanService, PlanService>();
     }
 }
