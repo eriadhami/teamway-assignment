@@ -30,6 +30,13 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(notFoundPlanException);
         }
+        catch (SqlException sqlException)
+        {
+            var failedPlanStorageException =
+                new FailedPlanStorageException(sqlException);
+
+            throw CreateAndLogCriticalDependencyException(failedPlanStorageException);
+        }
         catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
         {
             var invalidPlanReferenceException =
