@@ -48,4 +48,24 @@ public class WorkersController : RESTFulController
             return InternalServerError(workerServiceException);
         }
     }
+
+    [HttpGet]
+    public ActionResult<IQueryable<Worker>> GetAllWorkers()
+    {
+        try
+        {
+            IQueryable<Worker> retrievedWorkers =
+                this.workerService.RetrieveAllWorkers();
+
+            return Ok(retrievedWorkers);
+        }
+        catch (WorkerDependencyException workerDependencyException)
+        {
+            return InternalServerError(workerDependencyException);
+        }
+        catch (WorkerServiceException workerServiceException)
+        {
+            return InternalServerError(workerServiceException);
+        }
+    }
 }
