@@ -50,4 +50,48 @@ public partial class PlanServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowDependencyValidationOnRemoveIfDatabaseUpdateConcurrencyErrorOccursAndLogItAsync()
+    {
+        // given
+        Guid somePlanId = Guid.NewGuid();
+
+        var databaseUpdateConcurrencyException =
+            new DbUpdateConcurrencyException();
+
+        var lockedPlanException =
+            new LockedPlanException(databaseUpdateConcurrencyException);
+
+        var expectedPlanDependencyValidationException =
+            new PlanDependencyException(lockedPlanException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()))
+                .ThrowsAsync(databaseUpdateConcurrencyException);
+
+        // when
+        ValueTask<Plan> removePlanByIdTask =
+            this.planService.RemovePlanByIdAsync(somePlanId);
+
+        // then
+        await Assert.ThrowsAsync<PlanDependencyException>(() =>
+            removePlanByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanDependencyValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.DeletePlanAsync(It.IsAny<Plan>()),
+                Times.Never);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
