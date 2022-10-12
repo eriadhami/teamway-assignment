@@ -53,4 +53,48 @@ public partial class PlanServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async void ShouldThrowValidationExceptionOnCreateIfReferenceErrorOccursAndLogItAsync()
+    {
+        // given
+        Plan somePlan = CreateRandomPlan();
+        somePlan.Date = DateOnly.FromDateTime(DateTime.UtcNow);
+        string randomMessage = GetRandomMessage();
+        string exceptionMessage = randomMessage;
+
+        var foreignKeyConstraintConflictException =
+            new ForeignKeyConstraintConflictException(exceptionMessage);
+
+        var invalidPlanReferenceException =
+            new InvalidPlanReferenceException(foreignKeyConstraintConflictException);
+
+        var expectedPlanDependencyValidationException =
+            new PlanDependencyException(invalidPlanReferenceException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertPlanAsync(
+                    It.IsAny<Plan>()))
+                        .ThrowsAsync(foreignKeyConstraintConflictException);
+
+        // when
+        ValueTask<Plan> addPlanTask =
+            this.planService.AddPlanAsync(somePlan);
+
+        // then
+        await Assert.ThrowsAsync<PlanDependencyException>(() =>
+            addPlanTask.AsTask());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanDependencyValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertPlanAsync(It.IsAny<Plan>()),
+                    Times.Once);
+
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+        this.storageBrokerMock.VerifyNoOtherCalls();
+    }
 }

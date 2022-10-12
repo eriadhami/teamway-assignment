@@ -47,4 +47,10 @@ public partial class PlanServiceTests
 
     private static SqlException GetSqlException() =>
         (SqlException)FormatterServices.GetUninitializedObject(typeof(SqlException));
+    
+    private static string GetRandomMessage() =>
+        new MnemonicString(wordCount: GetRandomNumber()).GetValue();
+
+    private static int GetRandomNumber() =>
+            new IntRange(min: 1, max: 23).GetValue();
 }
