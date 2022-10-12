@@ -94,4 +94,46 @@ public partial class PlanServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowServiceExceptionOnRemoveIfExceptionOccursAndLogItAsync()
+    {
+        // given
+        Guid somePlanId = Guid.NewGuid();
+        var serviceException = new Exception();
+
+        var failedPlanServiceException =
+            new FailedPlanServiceException(serviceException);
+
+        var expectedPlanServiceException =
+            new PlanServiceException(failedPlanServiceException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()))
+                .ThrowsAsync(serviceException);
+
+        // when
+        ValueTask<Plan> removePlanByIdTask =
+            this.planService.RemovePlanByIdAsync(somePlanId);
+
+        // then
+        await Assert.ThrowsAsync<PlanServiceException>(() =>
+            removePlanByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
+                    Times.Once());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanServiceException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.DeletePlanAsync(It.IsAny<Plan>()),
+                    Times.Never());
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
