@@ -15,6 +15,7 @@ public partial class PlanServiceTests
         Plan randomPlan = CreateRandomPlan();
         Plan inputPlan = randomPlan;
         Plan storagePlan = inputPlan;
+        storagePlan.Date = DateOnly.FromDateTime(DateTime.UtcNow);
         Plan expectedPlan = storagePlan.DeepClone();
 
         this.storageBrokerMock.Setup(broker =>
