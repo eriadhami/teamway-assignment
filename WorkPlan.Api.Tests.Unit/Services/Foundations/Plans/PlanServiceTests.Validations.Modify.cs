@@ -43,4 +43,53 @@ public partial class PlanServiceTests
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
+    
+    [Fact]
+    public async Task ShouldThrowValidationExceptionOnUpdateIfPlanIsInvalidAndLogItAsync()
+    {
+        // given
+        Plan invalidPlan = new Plan();
+
+        var invalidPlanException =
+            new InvalidPlanException();
+
+        invalidPlanException.AddData(
+            key: nameof(Plan.ID),
+            values: "Id is required");
+
+        invalidPlanException.AddData(
+            key: nameof(Plan.WorkerID),
+            values: "Id is required");
+
+        invalidPlanException.AddData(
+            key: nameof(Plan.ShiftID),
+            values: "Id is required");
+
+        invalidPlanException.AddData(
+            key: nameof(Plan.Date),
+            values: "Date is required");
+
+        var expectedPlanValidationException =
+            new PlanValidationException(invalidPlanException);
+
+        // when
+        ValueTask<Plan> updatePlanTask =
+            this.planService.ModifyPlanAsync(invalidPlan);
+
+        // then
+        await Assert.ThrowsAsync<PlanValidationException>(() =>
+            updatePlanTask.AsTask());
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.UpdatePlanAsync(invalidPlan),
+                Times.Never);
+
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+        this.storageBrokerMock.VerifyNoOtherCalls();
+    }
 }
