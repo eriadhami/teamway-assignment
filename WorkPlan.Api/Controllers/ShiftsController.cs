@@ -135,4 +135,42 @@ public class ShiftsController : RESTFulController
             return InternalServerError(shiftServiceException);
         }
     }
+
+    [HttpDelete("{shiftId}")]
+    public async ValueTask<ActionResult<Shift>> DeleteShiftByIdAsync(Guid shiftId)
+    {
+        try
+        {
+            Shift deletedShift =
+                await this.shiftService.RemoveShiftByIdAsync(shiftId);
+
+            return Ok(deletedShift);
+        }
+        catch (ShiftValidationException shiftValidationException)
+            when (shiftValidationException.InnerException is NotFoundShiftException)
+        {
+            return NotFound(shiftValidationException.InnerException);
+        }
+        catch (ShiftValidationException shiftValidationException)
+        {
+            return BadRequest(shiftValidationException.InnerException);
+        }
+        catch (ShiftDependencyValidationException shiftDependencyValidationException)
+            when (shiftDependencyValidationException.InnerException is LockedShiftException)
+        {
+            return Locked(shiftDependencyValidationException.InnerException);
+        }
+        catch (ShiftDependencyValidationException shiftDependencyValidationException)
+        {
+            return BadRequest(shiftDependencyValidationException);
+        }
+        catch (ShiftDependencyException shiftDependencyException)
+        {
+            return InternalServerError(shiftDependencyException);
+        }
+        catch (ShiftServiceException shiftServiceException)
+        {
+            return InternalServerError(shiftServiceException);
+        }
+    }
 }
