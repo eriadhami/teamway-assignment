@@ -135,4 +135,42 @@ public class WorkersController : RESTFulController
             return InternalServerError(workerServiceException);
         }
     }
+
+    [HttpDelete("{workerId}")]
+    public async ValueTask<ActionResult<Worker>> DeleteWorkerByIdAsync(Guid workerId)
+    {
+        try
+        {
+            Worker deletedWorker =
+                await this.workerService.RemoveWorkerByIdAsync(workerId);
+
+            return Ok(deletedWorker);
+        }
+        catch (WorkerValidationException workerValidationException)
+            when (workerValidationException.InnerException is NotFoundWorkerException)
+        {
+            return NotFound(workerValidationException.InnerException);
+        }
+        catch (WorkerValidationException workerValidationException)
+        {
+            return BadRequest(workerValidationException.InnerException);
+        }
+        catch (WorkerDependencyValidationException workerDependencyValidationException)
+            when (workerDependencyValidationException.InnerException is LockedWorkerException)
+        {
+            return Locked(workerDependencyValidationException.InnerException);
+        }
+        catch (WorkerDependencyValidationException workerDependencyValidationException)
+        {
+            return BadRequest(workerDependencyValidationException);
+        }
+        catch (WorkerDependencyException workerDependencyException)
+        {
+            return InternalServerError(workerDependencyException);
+        }
+        catch (WorkerServiceException workerServiceException)
+        {
+            return InternalServerError(workerServiceException);
+        }
+    }
 }
