@@ -69,6 +69,13 @@ public partial class PlanService
 
             throw CreateAndLogCriticalDependencyException(failedPlanStorageException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServicePlanException =
+                new FailedPlanServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServicePlanException);
+        }
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
