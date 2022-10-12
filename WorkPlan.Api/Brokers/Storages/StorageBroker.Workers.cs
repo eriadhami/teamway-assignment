@@ -11,6 +11,8 @@ public partial class StorageBroker
     public async ValueTask<Worker> InsertWorkerAsync(Worker worker)
     {
         EntityEntry<Worker> workerEntityEntry = await this.Workers.AddAsync(worker);
+        await this.SaveChangesAsync();
+        
         return workerEntityEntry.Entity;
     }
 

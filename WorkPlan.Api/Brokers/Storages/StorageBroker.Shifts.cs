@@ -11,6 +11,8 @@ public partial class StorageBroker
     public async ValueTask<Shift> InsertShiftAsync(Shift shift)
     {
         EntityEntry<Shift> shiftEntityEntry = await this.Shifts.AddAsync(shift);
+        await this.SaveChangesAsync();
+        
         return shiftEntityEntry.Entity;
     }
 
