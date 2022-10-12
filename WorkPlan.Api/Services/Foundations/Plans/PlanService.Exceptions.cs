@@ -37,13 +37,6 @@ public partial class PlanService
 
             throw CreateAndLogCriticalDependencyException(failedPlanStorageException);
         }
-        catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
-        {
-            var invalidPlanReferenceException =
-                new InvalidPlanReferenceException(foreignKeyConstraintConflictException);
-
-            throw CreateAndLogDependencyException(invalidPlanReferenceException);
-        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStoragePlanException =
