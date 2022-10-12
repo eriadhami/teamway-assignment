@@ -8,4 +8,5 @@ public interface IPlanService
     IQueryable<Plan> RetrieveAllPlans();
     ValueTask<Plan> RetrievePlanByIdAsync(Guid planId);
     ValueTask<Plan> ModifyPlanAsync(Plan plan);
+    ValueTask<Plan> RemovePlanByIdAsync(Guid planId);
 }
