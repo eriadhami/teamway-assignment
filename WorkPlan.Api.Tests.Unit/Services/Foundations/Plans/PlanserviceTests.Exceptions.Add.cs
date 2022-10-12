@@ -97,4 +97,47 @@ public partial class PlanServiceTests
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowDependencyExceptionOnCreateIfDatabaseUpdateErrorOccursAndLogItAsync()
+    {
+        // given
+        int randomNumber = GetRandomNumber();
+        Plan somePlan = CreateRandomPlan();
+        somePlan.Date = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var databaseUpdateException =
+            new DbUpdateException();
+
+        var failedPlanStorageException =
+            new FailedPlanStorageException(databaseUpdateException);
+
+        var expectedPlanDependencyException =
+            new PlanDependencyException(failedPlanStorageException);
+
+        this.storageBrokerMock.Setup(broker =>
+                broker.InsertPlanAsync(
+                    It.IsAny<Plan>()))
+                        .ThrowsAsync(databaseUpdateException);
+
+        // when
+        ValueTask<Plan> addPlanTask =
+            this.planService.AddPlanAsync(somePlan);
+
+        // then
+        await Assert.ThrowsAsync<PlanDependencyException>(() =>
+            addPlanTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.InsertPlanAsync(It.IsAny<Plan>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanDependencyException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
