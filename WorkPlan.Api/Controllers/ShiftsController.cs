@@ -48,4 +48,24 @@ public class ShiftsController : RESTFulController
             return InternalServerError(shiftServiceException);
         }
     }
+
+    [HttpGet]
+    public ActionResult<IQueryable<Shift>> GetAllShifts()
+    {
+        try
+        {
+            IQueryable<Shift> retrievedShifts =
+                this.shiftService.RetrieveAllShifts();
+
+            return Ok(retrievedShifts);
+        }
+        catch (ShiftDependencyException shiftDependencyException)
+        {
+            return InternalServerError(shiftDependencyException);
+        }
+        catch (ShiftServiceException shiftServiceException)
+        {
+            return InternalServerError(shiftServiceException);
+        }
+    }
 }
