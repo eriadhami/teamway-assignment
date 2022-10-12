@@ -96,4 +96,43 @@ public class ShiftsController : RESTFulController
             return InternalServerError(shiftServiceException);
         }
     }
+
+    [HttpPut]
+    public async ValueTask<ActionResult<Shift>> PutShiftAsync(Shift shift)
+    {
+        try
+        {
+            Shift modifiedShift =
+                await this.shiftService.ModifyShiftAsync(shift);
+
+            return Ok(modifiedShift);
+        }
+        catch (ShiftValidationException shiftValidationException)
+            when (shiftValidationException.InnerException is NotFoundShiftException)
+        {
+            return NotFound(shiftValidationException.InnerException);
+        }
+        catch (ShiftValidationException shiftValidationException)
+        {
+            return BadRequest(shiftValidationException.InnerException);
+        }
+        catch (ShiftDependencyValidationException shiftValidationException)
+            when (shiftValidationException.InnerException is InvalidShiftReferenceException)
+        {
+            return FailedDependency(shiftValidationException.InnerException);
+        }
+        catch (ShiftDependencyValidationException shiftDependencyValidationException)
+            when (shiftDependencyValidationException.InnerException is AlreadyExistsShiftException)
+        {
+            return Conflict(shiftDependencyValidationException.InnerException);
+        }
+        catch (ShiftDependencyException shiftDependencyException)
+        {
+            return InternalServerError(shiftDependencyException);
+        }
+        catch (ShiftServiceException shiftServiceException)
+        {
+            return InternalServerError(shiftServiceException);
+        }
+    }
 }
