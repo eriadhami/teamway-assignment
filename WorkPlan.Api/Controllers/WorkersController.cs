@@ -96,4 +96,43 @@ public class WorkersController : RESTFulController
             return InternalServerError(workerServiceException);
         }
     }
+
+    [HttpPut]
+    public async ValueTask<ActionResult<Worker>> PutWorkerAsync(Worker worker)
+    {
+        try
+        {
+            Worker modifiedWorker =
+                await this.workerService.ModifyWorkerAsync(worker);
+
+            return Ok(modifiedWorker);
+        }
+        catch (WorkerValidationException workerValidationException)
+            when (workerValidationException.InnerException is NotFoundWorkerException)
+        {
+            return NotFound(workerValidationException.InnerException);
+        }
+        catch (WorkerValidationException workerValidationException)
+        {
+            return BadRequest(workerValidationException.InnerException);
+        }
+        catch (WorkerDependencyValidationException workerValidationException)
+            when (workerValidationException.InnerException is InvalidWorkerReferenceException)
+        {
+            return FailedDependency(workerValidationException.InnerException);
+        }
+        catch (WorkerDependencyValidationException workerDependencyValidationException)
+            when (workerDependencyValidationException.InnerException is AlreadyExistsWorkerException)
+        {
+            return Conflict(workerDependencyValidationException.InnerException);
+        }
+        catch (WorkerDependencyException workerDependencyException)
+        {
+            return InternalServerError(workerDependencyException);
+        }
+        catch (WorkerServiceException workerServiceException)
+        {
+            return InternalServerError(workerServiceException);
+        }
+    }
 }
