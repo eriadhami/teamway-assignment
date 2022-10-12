@@ -44,6 +44,13 @@ public partial class PlanService
 
             throw CreateAndLogDependencyException(invalidPlanReferenceException);
         }
+        catch (DbUpdateConcurrencyException databaseUpdateConcurrencyException)
+        {
+            var lockedPlanException =
+                new LockedPlanException(databaseUpdateConcurrencyException);
+
+            throw CreateAndLogDependencyException(lockedPlanException);
+        }
         catch (DbUpdateException databaseUpdateException)
         {
             var failedStoragePlanException =
