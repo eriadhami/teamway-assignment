@@ -1,5 +1,6 @@
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using WorkPlan.Api.Models.Plans;
 using WorkPlan.Api.Models.Plans.Exceptions;
 using Xeptions;
@@ -37,6 +38,13 @@ public partial class PlanService
                 new InvalidPlanReferenceException(foreignKeyConstraintConflictException);
 
             throw CreateAndLogDependencyException(invalidPlanReferenceException);
+        }
+        catch (DbUpdateException databaseUpdateException)
+        {
+            var failedStoragePlanException =
+                new FailedPlanStorageException(databaseUpdateException);
+
+            throw CreateAndLogDependencyException(failedStoragePlanException);
         }
     }
 
