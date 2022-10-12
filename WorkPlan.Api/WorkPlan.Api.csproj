@@ -13,6 +13,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+    <PackageReference Include="RESTFulSense" Version="2.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Xeption" Version="2.4.0" />
   </ItemGroup>
