@@ -27,4 +27,9 @@ public partial class PlanService : IPlanService
     
     public IQueryable<Plan> RetrieveAllPlans() =>
         TryCatch(() => this.storageBroker.SelectAllPlans());
+
+    public ValueTask<Plan> RetrievePlanByIdAsync(Guid planId)
+    {
+        throw new NotImplementedException();
+    }
 }
