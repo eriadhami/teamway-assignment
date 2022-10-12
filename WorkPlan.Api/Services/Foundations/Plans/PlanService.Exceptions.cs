@@ -44,13 +44,6 @@ public partial class PlanService
 
             throw CreateAndLogDependencyException(invalidPlanReferenceException);
         }
-        catch (DbUpdateException databaseUpdateException)
-        {
-            var failedStoragePlanException =
-                new FailedPlanStorageException(databaseUpdateException);
-
-            throw CreateAndLogDependencyException(failedStoragePlanException);
-        }
         catch (Exception serviceException)
         {
             var failedServicePlanException =
