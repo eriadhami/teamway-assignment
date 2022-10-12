@@ -40,4 +40,9 @@ public partial class PlanService : IPlanService
 
             return maybePlan;
         });
+    
+    public ValueTask<Plan> ModifyPlanAsync(Plan plan)
+    {
+        throw new NotImplementedException();
+    }
 }
