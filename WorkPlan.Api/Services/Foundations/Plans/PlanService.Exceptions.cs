@@ -58,6 +58,13 @@ public partial class PlanService
 
             throw CreateAndLogDependencyException(failedStoragePlanException);
         }
+        catch (Exception serviceException)
+        {
+            var failedServicePlanException =
+                new FailedPlanServiceException(serviceException);
+
+            throw CreateAndLogServiceException(failedServicePlanException);
+        }
     }
 
     private IQueryable<Plan> TryCatch(ReturningPlansFunction returningPlansFunction)
