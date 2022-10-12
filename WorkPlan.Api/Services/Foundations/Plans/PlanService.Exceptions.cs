@@ -1,3 +1,4 @@
+using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using WorkPlan.Api.Models.Plans;
 using WorkPlan.Api.Models.Plans.Exceptions;
@@ -30,6 +31,13 @@ public partial class PlanService
 
             throw CreateAndLogCriticalDependencyException(failedPlanStorageException);
         }
+        catch (ForeignKeyConstraintConflictException foreignKeyConstraintConflictException)
+        {
+            var invalidPlanReferenceException =
+                new InvalidPlanReferenceException(foreignKeyConstraintConflictException);
+
+            throw CreateAndLogDependencyException(invalidPlanReferenceException);
+        }
     }
 
     private PlanValidationException CreateAndLogValidationException(Xeption exception)
@@ -44,6 +52,14 @@ public partial class PlanService
     {
         var planDependencyException = new PlanDependencyException(exception);
         this.loggingBroker.LogCritical(planDependencyException);
+
+        return planDependencyException;
+    }
+
+    private PlanDependencyException CreateAndLogDependencyException(Xeption exception)
+    {
+        var planDependencyException = new PlanDependencyException(exception);
+        this.loggingBroker.LogError(planDependencyException);
 
         return planDependencyException;
     }
