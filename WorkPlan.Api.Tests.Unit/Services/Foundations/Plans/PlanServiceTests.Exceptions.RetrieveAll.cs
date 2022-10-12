@@ -43,4 +43,42 @@ public partial class PlanServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public void ShouldThrowServiceExceptionOnRetrieveAllWhenServiceErrorOccursAndLogIt()
+    {
+        //given
+        string exceptionMessage = GetRandomMessage();
+        var serviceException = new Exception(exceptionMessage);
+
+        var failedPlanServiceException =
+            new FailedPlanServiceException(serviceException);
+
+        var expectedPlanServiceException =
+            new PlanServiceException(failedPlanServiceException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectAllPlans())
+                .Throws(serviceException);
+
+        //when
+        Action retrieveAllPlansAction = () =>
+                this.planService.RetrieveAllPlans();
+
+        //then
+        Assert.Throws<PlanServiceException>(
+            retrieveAllPlansAction);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanServiceException))),
+                    Times.Once);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
