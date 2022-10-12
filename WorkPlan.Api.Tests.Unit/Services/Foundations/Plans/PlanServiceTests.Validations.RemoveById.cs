@@ -47,4 +47,46 @@ public partial class PlanServiceTests
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }
+
+    [Fact]
+    public async Task ShouldThrowNotFoundExceptionOnRemovePlanByIdIsNotFoundAndLogItAsync()
+    {
+        // given
+        Guid inputPlanId = Guid.NewGuid();
+        Plan noPlan = null;
+
+        var notFoundPlanException =
+            new NotFoundPlanException(inputPlanId);
+
+        var expectedPlanValidationException =
+            new PlanValidationException(notFoundPlanException);
+
+        this.storageBrokerMock.Setup(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync(noPlan);
+
+        // when
+        ValueTask<Plan> removePlanByIdTask =
+            this.planService.RemovePlanByIdAsync(inputPlanId);
+
+        // then
+        await Assert.ThrowsAsync<PlanValidationException>(() =>
+            removePlanByIdTask.AsTask());
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+
+        this.loggingBrokerMock.Verify(broker =>
+            broker.LogError(It.Is(SameExceptionAs(
+                expectedPlanValidationException))),
+                    Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.DeletePlanAsync(It.IsAny<Plan>()),
+                Times.Never);
+
+        this.storageBrokerMock.VerifyNoOtherCalls();
+        this.loggingBrokerMock.VerifyNoOtherCalls();
+    }
 }
