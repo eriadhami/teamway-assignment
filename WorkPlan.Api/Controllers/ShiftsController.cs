@@ -68,4 +68,32 @@ public class ShiftsController : RESTFulController
             return InternalServerError(shiftServiceException);
         }
     }
+
+    [HttpGet("{shiftId}")]
+    public async ValueTask<ActionResult<Shift>> GetShiftByIdAsync(Guid shiftId)
+    {
+        try
+        {
+            Shift shift = await this.shiftService.RetrieveShiftByIdAsync(shiftId);
+
+            return Ok(shift);
+        }
+        catch (ShiftValidationException shiftValidationException)
+            when (shiftValidationException.InnerException is NotFoundShiftException)
+        {
+            return NotFound(shiftValidationException.InnerException);
+        }
+        catch (ShiftValidationException shiftValidationException)
+        {
+            return BadRequest(shiftValidationException.InnerException);
+        }
+        catch (ShiftDependencyException shiftDependencyException)
+        {
+            return InternalServerError(shiftDependencyException);
+        }
+        catch (ShiftServiceException shiftServiceException)
+        {
+            return InternalServerError(shiftServiceException);
+        }
+    }
 }
