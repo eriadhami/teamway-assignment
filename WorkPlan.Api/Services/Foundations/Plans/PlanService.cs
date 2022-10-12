@@ -28,8 +28,14 @@ public partial class PlanService : IPlanService
     public IQueryable<Plan> RetrieveAllPlans() =>
         TryCatch(() => this.storageBroker.SelectAllPlans());
 
-    public async ValueTask<Plan> RetrievePlanByIdAsync(Guid planId)
-    {
-        return await this.storageBroker.SelectPlanByIdAsync(planId);
-    }
+    public ValueTask<Plan> RetrievePlanByIdAsync(Guid planId) =>
+        TryCatch(async () =>
+        {
+            ValidatePlanId(planId);
+
+            Plan maybePlan = await this.storageBroker
+                .SelectPlanByIdAsync(planId);
+
+            return maybePlan;
+        });
 }

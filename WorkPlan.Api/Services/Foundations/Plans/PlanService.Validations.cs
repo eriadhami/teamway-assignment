@@ -42,6 +42,9 @@ public partial class PlanService
         invalidPlanException.ThrowIfContainsErrors();
     }
 
+    private void ValidatePlanId(Guid planId) =>
+        Validate((Rule: IsInvalid(planId), Parameter: nameof(Plan.ID)));
+
     private static dynamic IsInvalid(Guid id) => new
     {
         Condition = id == Guid.Empty,
