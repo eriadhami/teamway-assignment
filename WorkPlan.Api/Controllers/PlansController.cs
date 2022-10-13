@@ -135,4 +135,42 @@ public class PlansController : RESTFulController
             return InternalServerError(planServiceException);
         }
     }
+
+    [HttpDelete("{planId}")]
+    public async ValueTask<ActionResult<Plan>> DeletePlanByIdAsync(Guid planId)
+    {
+        try
+        {
+            Plan deletedPlan =
+                await this.planService.RemovePlanByIdAsync(planId);
+
+            return Ok(deletedPlan);
+        }
+        catch (PlanValidationException planValidationException)
+            when (planValidationException.InnerException is NotFoundPlanException)
+        {
+            return NotFound(planValidationException.InnerException);
+        }
+        catch (PlanValidationException planValidationException)
+        {
+            return BadRequest(planValidationException.InnerException);
+        }
+        catch (PlanDependencyValidationException planDependencyValidationException)
+            when (planDependencyValidationException.InnerException is LockedPlanException)
+        {
+            return Locked(planDependencyValidationException.InnerException);
+        }
+        catch (PlanDependencyValidationException planDependencyValidationException)
+        {
+            return BadRequest(planDependencyValidationException);
+        }
+        catch (PlanDependencyException planDependencyException)
+        {
+            return InternalServerError(planDependencyException);
+        }
+        catch (PlanServiceException planServiceException)
+        {
+            return InternalServerError(planServiceException);
+        }
+    }
 }
