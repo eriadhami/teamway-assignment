@@ -48,4 +48,24 @@ public class PlansController : RESTFulController
             return InternalServerError(planServiceException);
         }
     }
+
+    [HttpGet]
+    public ActionResult<IQueryable<Plan>> GetAllPlans()
+    {
+        try
+        {
+            IQueryable<Plan> retrievedPlans =
+                this.planService.RetrieveAllPlans();
+
+            return Ok(retrievedPlans);
+        }
+        catch (PlanDependencyException planDependencyException)
+        {
+            return InternalServerError(planDependencyException);
+        }
+        catch (PlanServiceException planServiceException)
+        {
+            return InternalServerError(planServiceException);
+        }
+    }
 }
