@@ -30,6 +30,10 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(notFoundPlanException);
         }
+        catch (DublicatePlanWorkerDateException duplicatePlanException)
+        {
+            throw CreateAndLogValidationException(duplicatePlanException);
+        }
         catch (SqlException sqlException)
         {
             var failedPlanStorageException =
