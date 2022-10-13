@@ -68,4 +68,32 @@ public class PlansController : RESTFulController
             return InternalServerError(planServiceException);
         }
     }
+
+    [HttpGet("{planId}")]
+    public async ValueTask<ActionResult<Plan>> GetPlanByIdAsync(Guid planId)
+    {
+        try
+        {
+            Plan plan = await this.planService.RetrievePlanByIdAsync(planId);
+
+            return Ok(plan);
+        }
+        catch (PlanValidationException planValidationException)
+            when (planValidationException.InnerException is NotFoundPlanException)
+        {
+            return NotFound(planValidationException.InnerException);
+        }
+        catch (PlanValidationException planValidationException)
+        {
+            return BadRequest(planValidationException.InnerException);
+        }
+        catch (PlanDependencyException planDependencyException)
+        {
+            return InternalServerError(planDependencyException);
+        }
+        catch (PlanServiceException planServiceException)
+        {
+            return InternalServerError(planServiceException);
+        }
+    }
 }
