@@ -25,6 +25,7 @@ public class Startup
                 .AddJsonOptions(options =>
                     {
                         options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+                        options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
                     });
 
         services.AddDbContext<StorageBroker>();
