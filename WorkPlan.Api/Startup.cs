@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using WorkPlan.Api.Brokers.DateTimes;
 using WorkPlan.Api.Brokers.Loggings;
@@ -41,6 +42,13 @@ public class Startup
             options.SwaggerDoc(
                 name: "v1",
                 info: openApiInfo);
+
+            options.MapType<TimeOnly>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "time",
+                Example = new OpenApiString("10:30:45.000")
+            });
         });
     }
 
