@@ -50,6 +50,13 @@ public class Startup
                 Format = "time",
                 Example = new OpenApiString("10:30:45.000")
             });
+
+            options.MapType<DateOnly>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "date",
+                Example = new OpenApiString("2022-12-02")
+            });
         });
     }
 
