@@ -96,4 +96,43 @@ public class PlansController : RESTFulController
             return InternalServerError(planServiceException);
         }
     }
+
+    [HttpPut]
+    public async ValueTask<ActionResult<Plan>> PutPlanAsync(Plan plan)
+    {
+        try
+        {
+            Plan modifiedPlan =
+                await this.planService.ModifyPlanAsync(plan);
+
+            return Ok(modifiedPlan);
+        }
+        catch (PlanValidationException planValidationException)
+            when (planValidationException.InnerException is NotFoundPlanException)
+        {
+            return NotFound(planValidationException.InnerException);
+        }
+        catch (PlanValidationException planValidationException)
+        {
+            return BadRequest(planValidationException.InnerException);
+        }
+        catch (PlanDependencyValidationException planValidationException)
+            when (planValidationException.InnerException is InvalidPlanReferenceException)
+        {
+            return FailedDependency(planValidationException.InnerException);
+        }
+        catch (PlanDependencyValidationException planDependencyValidationException)
+            when (planDependencyValidationException.InnerException is AlreadyExistsPlanException)
+        {
+            return Conflict(planDependencyValidationException.InnerException);
+        }
+        catch (PlanDependencyException planDependencyException)
+        {
+            return InternalServerError(planDependencyException);
+        }
+        catch (PlanServiceException planServiceException)
+        {
+            return InternalServerError(planServiceException);
+        }
+    }
 }
