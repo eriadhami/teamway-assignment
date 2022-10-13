@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using WorkPlan.Api.Brokers.DateTimes;
 using WorkPlan.Api.Brokers.Loggings;
 using WorkPlan.Api.Brokers.Storages;
+using WorkPlan.Api.Helpers;
 using WorkPlan.Api.Services.Foundations.Plans;
 using WorkPlan.Api.Services.Foundations.Shifts;
 using WorkPlan.Api.Services.Foundations.Workers;
@@ -18,7 +19,13 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddLogging();
-        services.AddControllers();
+        
+        services.AddControllers()
+                .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
+                    });
+
         services.AddDbContext<StorageBroker>();
         AddBrokers(services);
         AddServices(services);
