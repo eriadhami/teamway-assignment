@@ -30,7 +30,7 @@ public partial class PlanService
         {
             throw CreateAndLogValidationException(notFoundPlanException);
         }
-        catch (DublicatePlanWorkerDateException duplicatePlanException)
+        catch (DuplicatePlanWorkerDateException duplicatePlanException)
         {
             throw CreateAndLogValidationException(duplicatePlanException);
         }

@@ -66,7 +66,7 @@ public partial class PlanService
 
         if (exist)
             {
-                throw new DublicatePlanWorkerDateException();
+                throw new DuplicatePlanWorkerDateException();
             }
     }
 

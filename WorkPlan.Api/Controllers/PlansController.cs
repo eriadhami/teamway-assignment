@@ -40,7 +40,7 @@ public class PlansController : RESTFulController
             return Conflict(planDependencyValidationException.InnerException);
         }
         catch (PlanDependencyValidationException planValidationException)
-            when (planValidationException.InnerException is DublicatePlanWorkerDateException)
+            when (planValidationException.InnerException is DuplicatePlanWorkerDateException)
         {
             return UnprocessableEntity(planValidationException.InnerException);
         }
