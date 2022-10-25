@@ -41,6 +41,10 @@ public partial class PlanServiceTests
                 Times.Once);
 
         this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
             broker.UpdatePlanAsync(inputPlan),
                 Times.Once);
 

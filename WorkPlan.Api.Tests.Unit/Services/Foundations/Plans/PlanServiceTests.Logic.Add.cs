@@ -33,6 +33,10 @@ public partial class PlanServiceTests
             broker.InsertPlanAsync(inputPlan),
                 Times.Once);
 
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
+
         this.storageBrokerMock.VerifyNoOtherCalls();
         this.loggingBrokerMock.VerifyNoOtherCalls();
     }

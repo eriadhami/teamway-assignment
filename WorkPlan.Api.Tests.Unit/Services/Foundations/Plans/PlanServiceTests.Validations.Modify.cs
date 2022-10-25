@@ -124,6 +124,10 @@ public partial class PlanServiceTests
         this.storageBrokerMock.Verify(broker =>
             broker.SelectPlanByIdAsync(nonExistPlan.ID),
                 Times.Once);
+        
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
 
         this.loggingBrokerMock.Verify(broker =>
             broker.LogError(It.Is(SameExceptionAs(

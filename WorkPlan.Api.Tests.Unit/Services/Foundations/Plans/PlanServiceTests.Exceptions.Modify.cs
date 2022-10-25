@@ -42,6 +42,10 @@ public partial class PlanServiceTests
         this.storageBrokerMock.Verify(broker =>
             broker.SelectPlanByIdAsync(randomPlan.ID),
                 Times.Once);
+        
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
 
         this.loggingBrokerMock.Verify(broker =>
             broker.LogCritical(It.Is(SameExceptionAs(
@@ -92,6 +96,10 @@ public partial class PlanServiceTests
         this.storageBrokerMock.Verify(broker =>
             broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
                     Times.Once);
+        
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
+                Times.Once);
 
         this.loggingBrokerMock.VerifyNoOtherCalls();
         this.storageBrokerMock.VerifyNoOtherCalls();
@@ -129,6 +137,10 @@ public partial class PlanServiceTests
 
         this.storageBrokerMock.Verify(broker =>
             broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+        
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
                 Times.Once);
 
         this.loggingBrokerMock.Verify(broker =>
@@ -170,6 +182,10 @@ public partial class PlanServiceTests
 
         this.storageBrokerMock.Verify(broker =>
             broker.SelectPlanByIdAsync(It.IsAny<Guid>()),
+                Times.Once);
+
+        this.storageBrokerMock.Verify(broker =>
+            broker.SelectAllPlans(),
                 Times.Once);
 
         this.loggingBrokerMock.Verify(broker =>
